@@ -13,10 +13,10 @@ interface Props {
 }
 
 const PER_PAGE_OPTIONS = [
-  { value: "6",  label: "6 par page"  },
-  { value: "9",  label: "9 par page"  },
-  { value: "12", label: "12 par page" },
-  { value: "24", label: "24 par page" },
+  { value: "6",  label: "6"  },
+  { value: "9",  label: "9"  },
+  { value: "12", label: "12" },
+  { value: "24", label: "24" },
 ];
 
 export default function ListingFilters({ purpose, currentFilters }: Props) {
@@ -31,7 +31,7 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
   const [orderBy,  setOrderBy]  = useState(currentFilters.orderBy  ?? "date_desc");
   const [limit,    setLimit]    = useState(currentFilters.limit    ?? "9");
 
-  function applyFilters() {
+  function apply() {
     const params = new URLSearchParams();
     if (type)     params.set("type",     type);
     if (city)     params.set("city",     city);
@@ -40,11 +40,11 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
     if (bedrooms) params.set("bedrooms", bedrooms);
     if (orderBy)  params.set("orderBy",  orderBy);
     if (limit)    params.set("limit",    limit);
-    params.set("page", "1"); // reset to page 1 on filter change
+    params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  function clearFilters() {
+  function clear() {
     setType(""); setCity(""); setMinPrice("");
     setMaxPrice(""); setBedrooms(""); setOrderBy("date_desc"); setLimit("9");
     router.push(pathname);
@@ -54,30 +54,30 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
   return (
     <div className="filters">
-      <div className="filters-header">
-        <div className="filters-title">
-          <SlidersHorizontal size={16} />
+      {/* Header */}
+      <div className="filters__head">
+        <div className="filters__title">
+          <SlidersHorizontal size={14} />
           Filtres
         </div>
         {hasFilters && (
-          <button onClick={clearFilters} className="filters-clear">
-            <X size={13} /> Effacer
+          <button onClick={clear} className="filters__clear">
+            <X size={12} /> Effacer
           </button>
         )}
       </div>
 
       {/* Per page */}
       <div className="filter-group">
-        <label className="filter-label">Afficher</label>
-        <div className="pill-group">
+        <span className="filter-label">Par page</span>
+        <div className="pill-row">
           {PER_PAGE_OPTIONS.map(o => (
             <button
               key={o.value}
-              type="button"
               onClick={() => setLimit(o.value)}
-              className={`pill ${limit === o.value ? "active" : ""}`}
+              className={`pill ${limit === o.value ? "pill--active" : ""}`}
             >
-              {o.value}
+              {o.label}
             </button>
           ))}
         </div>
@@ -85,8 +85,8 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Sort */}
       <div className="filter-group">
-        <label className="filter-label">Trier par</label>
-        <select className="filter-input" value={orderBy} onChange={e => setOrderBy(e.target.value)}>
+        <span className="filter-label">Trier par</span>
+        <select className="filter-select" value={orderBy} onChange={e => setOrderBy(e.target.value)}>
           {SORT_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
@@ -95,8 +95,8 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Type */}
       <div className="filter-group">
-        <label className="filter-label">Type de bien</label>
-        <select className="filter-input" value={type} onChange={e => setType(e.target.value)}>
+        <span className="filter-label">Type de bien</span>
+        <select className="filter-select" value={type} onChange={e => setType(e.target.value)}>
           <option value="">Tous les types</option>
           {TYPE_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -106,8 +106,8 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* City */}
       <div className="filter-group">
-        <label className="filter-label">Ville</label>
-        <select className="filter-input" value={city} onChange={e => setCity(e.target.value)}>
+        <span className="filter-label">Ville</span>
+        <select className="filter-select" value={city} onChange={e => setCity(e.target.value)}>
           <option value="">Toutes les villes</option>
           {CITY_NAMES.map(c => (
             <option key={c} value={c}>{c}</option>
@@ -115,34 +115,31 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
         </select>
       </div>
 
-      {/* Price range */}
+      {/* Price */}
       <div className="filter-group">
-        <label className="filter-label">Budget (MAD)</label>
-        <div className="price-range">
+        <span className="filter-label">Budget (MAD)</span>
+        <div className="filter-range">
           <input
-            type="number" className="filter-input"
-            placeholder="Min" value={minPrice}
-            onChange={e => setMinPrice(e.target.value)} min={0}
+            type="number" className="filter-input" placeholder="Min"
+            value={minPrice} onChange={e => setMinPrice(e.target.value)} min={0}
           />
-          <span className="price-sep">—</span>
+          <span className="filter-range-sep">—</span>
           <input
-            type="number" className="filter-input"
-            placeholder="Max" value={maxPrice}
-            onChange={e => setMaxPrice(e.target.value)} min={0}
+            type="number" className="filter-input" placeholder="Max"
+            value={maxPrice} onChange={e => setMaxPrice(e.target.value)} min={0}
           />
         </div>
       </div>
 
       {/* Bedrooms */}
       <div className="filter-group">
-        <label className="filter-label">Chambres (min)</label>
-        <div className="pill-group">
+        <span className="filter-label">Chambres (min)</span>
+        <div className="pill-row">
           {BEDROOMS_OPTIONS.map(o => (
             <button
               key={o.value}
-              type="button"
               onClick={() => setBedrooms(bedrooms === String(o.value) ? "" : String(o.value))}
-              className={`pill ${bedrooms === String(o.value) ? "active" : ""}`}
+              className={`pill ${bedrooms === String(o.value) ? "pill--active" : ""}`}
             >
               {o.value}+
             </button>
@@ -150,69 +147,105 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
         </div>
       </div>
 
-      <button onClick={applyFilters} className="filters-apply">
-        Appliquer les filtres
+      <button onClick={apply} className="filters__apply">
+        Appliquer
       </button>
 
       <style>{`
         .filters {
-          background: var(--white); border-radius: var(--radius-lg);
+          background: var(--surface-2);
           border: 1px solid var(--border);
-          padding: 24px; display: flex; flex-direction: column; gap: 20px;
+          border-radius: var(--r-lg);
+          padding: 24px;
+          display: flex; flex-direction: column; gap: 24px;
         }
-        .filters-header {
+
+        .filters__head {
           display: flex; align-items: center; justify-content: space-between;
         }
-        .filters-title {
+        .filters__title {
           display: flex; align-items: center; gap: 8px;
-          font-size: 15px; font-weight: 600; color: var(--charcoal);
+          font-size: 13px; font-weight: 600;
+          color: var(--white); letter-spacing: 0.04em;
         }
-        .filters-clear {
+        .filters__clear {
           display: flex; align-items: center; gap: 4px;
-          font-size: 12px; color: var(--terracotta);
           background: none; border: none; cursor: pointer;
+          font-size: 11px; color: var(--gold);
           padding: 4px 8px; border-radius: 4px;
           transition: background 0.15s ease;
+          font-family: var(--font-ui);
+          letter-spacing: 0.04em;
         }
-        .filters-clear:hover { background: rgba(196,113,79,0.08); }
+        .filters__clear:hover { background: rgba(184,151,90,0.1); }
 
-        .filter-group { display: flex; flex-direction: column; gap: 8px; }
+        .filter-group { display: flex; flex-direction: column; gap: 10px; }
         .filter-label {
-          font-size: 11px; font-weight: 600; color: var(--muted);
-          text-transform: uppercase; letter-spacing: 0.06em;
+          font-size: 10px; font-weight: 600;
+          color: var(--muted); text-transform: uppercase;
+          letter-spacing: 0.12em;
         }
+
+        .filter-select {
+          background: var(--surface-3);
+          border: 1px solid var(--border);
+          border-radius: var(--r-sm);
+          padding: 10px 12px;
+          font-size: 13px; color: var(--off-white);
+          font-family: var(--font-ui);
+          outline: none; width: 100%;
+          appearance: none; cursor: pointer;
+          transition: border-color 0.2s ease;
+        }
+        .filter-select:focus { border-color: var(--gold); }
+        .filter-select option { background: var(--surface-3); color: var(--off-white); }
+
+        .filter-range { display: flex; align-items: center; gap: 8px; }
+        .filter-range-sep { color: var(--muted); font-size: 12px; flex-shrink: 0; }
         .filter-input {
-          background: var(--cream); border: 1px solid var(--border);
-          border-radius: var(--radius-sm); padding: 9px 12px;
-          font-size: 13px; color: var(--ink);
-          font-family: var(--font-body); outline: none; width: 100%;
-          transition: border-color 0.15s ease; appearance: none;
+          background: var(--surface-3);
+          border: 1px solid var(--border);
+          border-radius: var(--r-sm);
+          padding: 10px 12px;
+          font-size: 13px; color: var(--off-white);
+          font-family: var(--font-ui);
+          outline: none; width: 100%;
+          transition: border-color 0.2s ease;
         }
-        .filter-input:focus { border-color: var(--terracotta); }
+        .filter-input::placeholder { color: var(--muted); }
+        .filter-input:focus { border-color: var(--gold); }
 
-        .price-range { display: flex; align-items: center; gap: 8px; }
-        .price-sep   { color: var(--muted); font-size: 14px; flex-shrink: 0; }
-
-        .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
         .pill {
-          padding: 6px 14px; border-radius: 20px; font-size: 13px;
-          border: 1.5px solid var(--border); background: var(--cream);
-          color: var(--muted); cursor: pointer; font-family: var(--font-body);
-          transition: all 0.15s ease;
+          padding: 7px 14px; border-radius: 2px;
+          border: 1px solid var(--border);
+          background: var(--surface-3);
+          color: var(--muted-2);
+          font-size: 12px; font-weight: 500;
+          font-family: var(--font-ui);
+          cursor: pointer; transition: all 0.15s ease;
+          letter-spacing: 0.04em;
         }
-        .pill:hover  { border-color: var(--terracotta); color: var(--terracotta); }
-        .pill.active {
-          border-color: var(--terracotta); color: var(--terracotta);
-          background: rgba(196,113,79,0.08); font-weight: 600;
+        .pill:hover { border-color: var(--gold); color: var(--gold); }
+        .pill--active {
+          border-color: var(--gold);
+          color: var(--gold);
+          background: rgba(184,151,90,0.1);
         }
 
-        .filters-apply {
-          background: var(--terracotta); color: white; border: none;
-          border-radius: var(--radius-md); padding: 12px;
-          font-size: 14px; font-weight: 500; cursor: pointer;
-          font-family: var(--font-body); transition: all 0.2s ease; margin-top: 4px;
+        .filters__apply {
+          background: var(--gold); color: var(--black);
+          border: none; border-radius: var(--r-sm);
+          padding: 12px; font-size: 12px;
+          font-weight: 600; cursor: pointer;
+          font-family: var(--font-ui);
+          letter-spacing: 0.1em; text-transform: uppercase;
+          transition: all 0.2s ease; margin-top: 4px;
         }
-        .filters-apply:hover { background: var(--terra-dark); }
+        .filters__apply:hover {
+          background: var(--gold-light);
+          box-shadow: 0 4px 20px rgba(184,151,90,0.3);
+        }
       `}</style>
     </div>
   );

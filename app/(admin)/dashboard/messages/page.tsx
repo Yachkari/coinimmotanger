@@ -1,9 +1,8 @@
 import { getContactMessages } from "@/lib/supabase/queries";
 import { relativeTime } from "@/lib/utils";
-import DeleteMessageButton from "@/components/admin/DeleteMessageButton";
 import MarkReadButton from "@/components/admin/MarkReadButton";
 import { MessageSquare, Mail, Phone, Home } from "lucide-react";
-
+import DeleteMessageButton from "@/components/admin/DeleteMessageButton";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Messages" };
@@ -14,145 +13,185 @@ export default async function MessagesPage() {
   const unread   = messages.filter((m) => !m.is_read).length;
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="mp">
+
+      {/* Header */}
+      <div className="mp__header">
         <div>
-          <h1 className="page-title">Messages</h1>
-          <p className="page-sub">
+          <span className="mp__eyebrow">◆ Boîte de réception</span>
+          <h1 className="mp__title">Messages</h1>
+          <p className="mp__sub">
             {messages.length} message{messages.length !== 1 ? "s" : ""}
-            {unread > 0 && ` · ${unread} non lu${unread !== 1 ? "s" : ""}`}
+            {unread > 0 && <> · <span className="mp__unread-count">{unread} non lu{unread !== 1 ? "s" : ""}</span></>}
           </p>
         </div>
       </div>
 
       {messages.length === 0 ? (
-        <div className="empty-panel">
-          <MessageSquare size={32} />
+        <div className="mp__empty">
+          <MessageSquare size={28} strokeWidth={1} />
           <p>Aucun message pour l'instant.</p>
         </div>
       ) : (
-        <div className="messages-list">
+        <div className="mp__list">
           {messages.map((m) => (
-            <div key={m.id} className={`msg-card ${m.is_read ? "read" : "unread"}`}>
+            <div key={m.id} className={`mp__card ${m.is_read ? "" : "mp__card--unread"}`}>
 
-              {/* Header */}
-              <div className="msg-card-header">
-                <div className="msg-sender">
-                  <div className="msg-avatar">
-                    {m.name.charAt(0).toUpperCase()}
-                  </div>
+              {/* Card header */}
+              <div className="mp__card-hd">
+                <div className="mp__sender">
+                  <div className="mp__avatar">{m.name.charAt(0).toUpperCase()}</div>
                   <div>
-                    <div className="msg-name">{m.name}</div>
-                    <div className="msg-time">{relativeTime(m.created_at)}</div>
+                    <div className="mp__name">{m.name}</div>
+                    <div className="mp__time">{relativeTime(m.created_at)}</div>
                   </div>
                 </div>
-
-                <div className="msg-actions">
-                  {!m.is_read && <span className="unread-dot" />}
+                <div className="mp__hd-right">
+                  {!m.is_read && <span className="mp__dot" title="Non lu" />}
                   <MarkReadButton id={m.id} isRead={m.is_read} />
-                   <DeleteMessageButton id={m.id} />
+                  <DeleteMessageButton id={m.id} />
                 </div>
               </div>
 
-              {/* Contact info */}
-              <div className="msg-meta">
-                <a href={`mailto:${m.email}`} className="msg-meta-item">
-                  <Mail size={13} /> {m.email}
+              {/* Meta row */}
+              <div className="mp__meta">
+                <a href={`mailto:${m.email}`} className="mp__meta-item">
+                  <Mail size={12} /> {m.email}
                 </a>
                 {m.phone && (
-                  <a href={`tel:${m.phone}`} className="msg-meta-item">
-                    <Phone size={13} /> {m.phone}
+                  <a href={`tel:${m.phone}`} className="mp__meta-item">
+                    <Phone size={12} /> {m.phone}
                   </a>
                 )}
                 {m.listing_title && (
-                  <span className="msg-meta-item listing">
-                    <Home size={13} /> {m.listing_title}
+                  <span className="mp__meta-item mp__meta-item--listing">
+                    <Home size={12} /> {m.listing_title}
                   </span>
                 )}
               </div>
 
-              {/* Message body */}
-              <p className="msg-body">{m.message}</p>
+              {/* Body */}
+              <p className="mp__body">{m.message}</p>
 
-              {/* Reply CTA */}
+              {/* Reply */}
               <a
                 href={`mailto:${m.email}?subject=Re: Votre demande${m.listing_title ? ` — ${m.listing_title}` : ""}`}
-                className="msg-reply-btn"
+                className="mp__reply"
               >
                 Répondre par email
               </a>
+
             </div>
           ))}
         </div>
       )}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;600&family=Playfair+Display:wght@600&display=swap');
+        .mp { color: #d8d5cf; max-width: 760px; animation: fadeUp .3s ease both; }
 
-        .page { font-family: 'DM Sans', sans-serif; color: #e0e0e0; max-width: 800px; }
-        .page-header { margin-bottom: 28px; }
-        .page-title  { font-family: 'Playfair Display', serif; font-size: 28px; color: #f0f0f0; margin-bottom: 4px; }
-        .page-sub    { font-size: 14px; color: #555; }
+        .mp__header {
+          padding-bottom: 28px; margin-bottom: 28px;
+          border-bottom: 1px solid #1a1a1a;
+        }
+        .mp__eyebrow {
+          display: block; font-size: 9px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: .22em;
+          color: #c9a84c; margin-bottom: 6px;
+        }
+        .mp__title {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px; font-weight: 400; color: #f0ece4;
+          margin: 0 0 4px; line-height: 1.1;
+        }
+        .mp__sub { font-size: 13px; color: #555; margin: 0; }
+        .mp__unread-count { color: #c9a84c; }
 
-        .empty-panel {
-          background: #141414; border: 1px solid #1f1f1f; border-radius: 12px;
-          padding: 60px; text-align: center; color: #555;
-          display: flex; flex-direction: column; align-items: center; gap: 12px;
+        .mp__empty {
+          background: #0f0f0f; border: 1px solid #1a1a1a;
+          padding: 80px 40px; text-align: center;
+          color: #444; font-size: 12px;
+          text-transform: uppercase; letter-spacing: .12em;
+          display: flex; flex-direction: column; align-items: center; gap: 14px;
         }
 
-        .messages-list { display: flex; flex-direction: column; gap: 12px; }
+        /* Cards */
+        .mp__list { display: flex; flex-direction: column; gap: 10px; }
 
-        .msg-card {
-          background: #141414; border: 1px solid #1f1f1f;
-          border-radius: 12px; padding: 24px; transition: border-color 0.15s ease;
+        .mp__card {
+          background: #0f0f0f; border: 1px solid #1a1a1a;
+          padding: 22px 24px;
+          transition: border-color .2s ease;
+          position: relative; overflow: hidden;
         }
-        .msg-card.unread { border-color: rgba(201,168,76,0.25); }
-        .msg-card:hover  { border-color: #2a2a2a; }
+        .mp__card::before {
+          content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+          width: 2px; background: transparent;
+          transition: background .2s ease;
+        }
+        .mp__card--unread { border-color: #222; }
+        .mp__card--unread::before { background: #c9a84c; }
+        .mp__card:hover { border-color: #252525; }
 
-        .msg-card-header {
+        /* Card header */
+        .mp__card-hd {
           display: flex; align-items: center; justify-content: space-between;
           margin-bottom: 14px;
         }
-        .msg-sender { display: flex; align-items: center; gap: 12px; }
-        .msg-avatar {
-          width: 40px; height: 40px; border-radius: 50%;
-          background: rgba(201,168,76,0.15); color: #c9a84c;
+        .mp__sender { display: flex; align-items: center; gap: 12px; }
+        .mp__avatar {
+          width: 36px; height: 36px; flex-shrink: 0;
+          background: rgba(201,168,76,.08);
+          border: 1px solid rgba(201,168,76,.2);
+          color: #c9a84c; font-size: 14px; font-weight: 700;
           display: flex; align-items: center; justify-content: center;
-          font-size: 16px; font-weight: 600; flex-shrink: 0;
         }
-        .msg-name { font-size: 15px; color: #e0e0e0; font-weight: 500; }
-        .msg-time { font-size: 12px; color: #555; margin-top: 2px; }
+        .mp__name { font-size: 14px; color: #e0ddd8; font-weight: 500; margin-bottom: 2px; }
+        .mp__time { font-size: 11px; color: #444; }
 
-        .msg-actions { display: flex; align-items: center; gap: 10px; }
-        .unread-dot {
-          width: 8px; height: 8px; border-radius: 50%; background: #c9a84c;
+        .mp__hd-right { display: flex; align-items: center; gap: 10px; }
+        .mp__dot {
+          width: 7px; height: 7px;
+          background: #c9a84c;
         }
 
-        .msg-meta {
+        /* Meta */
+        .mp__meta {
           display: flex; flex-wrap: wrap; gap: 16px;
-          margin-bottom: 14px; padding-bottom: 14px;
-          border-bottom: 1px solid #1a1a1a;
+          padding: 12px 0; margin-bottom: 14px;
+          border-top: 1px solid #141414;
+          border-bottom: 1px solid #141414;
         }
-        .msg-meta-item {
+        .mp__meta-item {
           display: flex; align-items: center; gap: 6px;
-          font-size: 13px; color: #888; text-decoration: none;
+          font-size: 12px; color: #666; text-decoration: none;
+          transition: color .15s ease;
         }
-        .msg-meta-item:hover { color: #c9a84c; }
-        .msg-meta-item.listing { color: #555; }
+        .mp__meta-item:hover { color: #c9a84c; }
+        .mp__meta-item--listing { color: #444; cursor: default; }
+        .mp__meta-item--listing:hover { color: #444; }
 
-        .msg-body {
-          font-size: 14px; color: #c0c0c0; line-height: 1.7;
-          margin-bottom: 16px; white-space: pre-wrap;
+        /* Body */
+        .mp__body {
+          font-size: 14px; color: #a8a5a0; line-height: 1.75;
+          margin: 0 0 18px; white-space: pre-wrap;
         }
 
-        .msg-reply-btn {
-          display: inline-block; padding: 8px 16px; border-radius: 7px;
-          background: rgba(201,168,76,0.1); color: #c9a84c;
-          text-decoration: none; font-size: 13px; font-weight: 500;
-          border: 1px solid rgba(201,168,76,0.2);
-          transition: all 0.15s ease;
+        /* Reply */
+        .mp__reply {
+          display: inline-block; padding: 7px 14px;
+          background: rgba(201,168,76,.07);
+          border: 1px solid rgba(201,168,76,.2);
+          color: #c9a84c; text-decoration: none;
+          font-size: 11px; font-weight: 600;
+          letter-spacing: .08em; text-transform: uppercase;
+          transition: all .15s ease;
         }
-        .msg-reply-btn:hover { background: rgba(201,168,76,0.18); }
+        .mp__reply:hover { background: rgba(201,168,76,.14); }
+
+        @keyframes fadeUp {
+          from { opacity:0; transform:translateY(10px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
       `}</style>
     </div>
   );

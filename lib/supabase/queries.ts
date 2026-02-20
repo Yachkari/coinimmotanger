@@ -264,27 +264,32 @@ export async function createListing(
 ): Promise<ApiResponse<Listing>> {
   try {
     const supabase = await createClient(true);
+    const slug = payload.slug;
 
-    const { error: insertError } = await supabase
-      .from("listings")
-      .insert(payload);
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const finalSlug = attempt === 0 ? slug : `${slug}-${attempt + 1}`;
 
-    // Slug collision → fetch the existing one (same slug = same listing intent)
-    // This handles React StrictMode double-invoke and accidental double submits
-    if (insertError && insertError.code !== "23505") {
-      throw insertError;
+      const { error } = await supabase
+        .from("listings")
+        .insert({ ...payload, slug: finalSlug });
+
+      if (!error) {
+        const { data, error: fetchError } = await supabase
+          .from("listings")
+          .select("*")
+          .eq("slug", finalSlug)
+          .single();
+
+        if (fetchError) throw fetchError;
+        return { data: data as Listing, error: null };
+      }
+
+      if (error.code === "23505") continue;
+
+      throw error;
     }
 
-    // Whether insert succeeded or slug already existed, fetch by slug
-    const { data, error: fetchError } = await supabase
-      .from("listings")
-      .select("*")
-      .eq("slug", payload.slug)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    return { data: data as Listing, error: null };
+    throw new Error("Impossible de générer un slug unique après 10 tentatives.");
   } catch (err) {
     console.error("[createListing]", err);
     return { data: null, error: "Impossible de créer l'annonce." };

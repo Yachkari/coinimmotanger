@@ -1,184 +1,227 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Listing } from "@/types";
-import { formatPrice, formatSurface, listingUrl, getCoverImage, formatType } from "@/lib/utils";
-import { Bed, Bath, Maximize2 } from "lucide-react";
+import { formatPrice, formatSurface, getCoverImage, formatType } from "@/lib/utils";
+import { Bed, Bath, Maximize2, MapPin } from "lucide-react";
 
 interface Props {
-  listing: Listing;
+  listing:  Listing;
   priority?: boolean;
+  variant?:  "default" | "compact";
 }
 
-const PURPOSE_BADGE: Record<string, { label: string; color: string }> = {
-  vente:    { label: "À Vendre",  color: "#c4714f" },
-  location: { label: "À Louer",  color: "#5a8a6a" },
-  vacances: { label: "Vacances", color: "#6a7fad" },
+const PURPOSE_LABEL: Record<string, string> = {
+  vente:    "Vente",
+  location: "Location",
+  vacances: "Vacances",
 };
 
-const STATUS_BADGE: Record<string, { label: string }> = {
-  vendu:   { label: "Vendu"    },
-  loue:    { label: "Loué"     },
-  reserve: { label: "Réservé"  },
-};
-
-export default function ListingCard({ listing, priority = false }: Props) {
+export default function ListingCard({ listing, priority = false, variant = "default" }: Props) {
   const coverUrl = getCoverImage(listing.listing_images ?? [], listing.cover_image_index);
-  const badge    = PURPOSE_BADGE[listing.purpose];
-  const status   = STATUS_BADGE[listing.status];
-  const href     = listingUrl(listing.purpose, listing.slug);
+  const href     = `/${listing.purpose}/${listing.slug}`;
+  const isSold   = listing.status !== "disponible";
+
+  const STATUS_LABEL: Record<string, string> = {
+    vendu:   "Vendu",
+    loue:    "Loué",
+    reserve: "Réservé",
+  };
 
   return (
-    <Link href={href} className="card">
+    <Link href={href} className={`lc lc--${variant}`}>
+
       {/* Image */}
-      <div className="card-img-wrap">
+      <div className="lc__img-wrap">
         {coverUrl ? (
           <Image
             src={coverUrl}
             alt={listing.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="card-img"
+            className="lc__img"
             priority={priority}
           />
         ) : (
-          <div className="card-img-placeholder">
-            <span>◆</span>
+          <div className="lc__no-img">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="currentColor" strokeWidth="1"/>
+            </svg>
+          </div>
+        )}
+
+        {/* Sold overlay */}
+        {isSold && (
+          <div className="lc__sold-overlay">
+            <span className={`badge badge-${listing.status}`}>
+              {STATUS_LABEL[listing.status]}
+            </span>
           </div>
         )}
 
         {/* Purpose badge */}
-        <span
-          className="card-badge"
-          style={{ background: badge.color }}
-        >
-          {badge.label}
-        </span>
-
-        {/* Sold/rented overlay */}
-        {status && (
-          <div className="card-status-overlay">
-            <span>{status.label}</span>
-          </div>
-        )}
+        <div className="lc__badges">
+          <span className="lc__purpose-badge">
+            {PURPOSE_LABEL[listing.purpose]}
+          </span>
+          {listing.is_featured && (
+            <span className="lc__featured-badge">★ Coup de cœur</span>
+          )}
+        </div>
       </div>
 
       {/* Info */}
-      <div className="card-body">
-        <p className="card-type">{formatType(listing.type)} · {listing.city}{listing.neighborhood ? `, ${listing.neighborhood}` : ""}</p>
-        <h3 className="card-title">{listing.title}</h3>
+      <div className="lc__body">
+        <div className="lc__location">
+          <MapPin size={12} />
+          {listing.city}{listing.neighborhood ? `, ${listing.neighborhood}` : ""}
+        </div>
 
-        <div className="card-specs">
+        <h3 className="lc__title">{listing.title}</h3>
+
+        <div className="lc__specs">
           {listing.surface && (
-            <span className="spec">
-              <Maximize2 size={13} />
+            <span className="lc__spec">
+              <Maximize2 size={12} />
               {formatSurface(listing.surface)}
             </span>
           )}
           {listing.bedrooms && (
-            <span className="spec">
-              <Bed size={13} />
+            <span className="lc__spec">
+              <Bed size={12} />
               {listing.bedrooms} ch.
             </span>
           )}
           {listing.bathrooms && (
-            <span className="spec">
-              <Bath size={13} />
+            <span className="lc__spec">
+              <Bath size={12} />
               {listing.bathrooms} sdb.
             </span>
           )}
         </div>
 
-        <div className="card-footer">
-          <span className="card-price">
+        <div className="lc__footer">
+          <span className="lc__price">
             {formatPrice(listing.price, listing.price_period)}
           </span>
-          <span className="card-arrow">→</span>
+          <span className="lc__cta">
+            Voir →
+          </span>
         </div>
       </div>
 
       <style>{`
-        .card {
+        .lc {
           display: flex; flex-direction: column;
-          background: var(--white);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
+          background: var(--surface-2);
           text-decoration: none;
-          box-shadow: var(--shadow-sm);
-          transition: all 0.3s ease;
+          overflow: hidden;
+          transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+          position: relative;
+          border-radius: var(--r-md);
           border: 1px solid var(--border);
+          height: 100%;
         }
-        .card:hover {
+        .lc::after {
+          content: '';
+          position: absolute; inset: 0;
+          border-radius: var(--r-md);
+          border: 1px solid transparent;
+          transition: border-color 0.3s ease;
+          pointer-events: none;
+        }
+        .lc:hover {
           transform: translateY(-4px);
-          box-shadow: var(--shadow-lg);
-          border-color: var(--sand);
+          box-shadow: var(--shadow-card), var(--shadow-glow);
+          border-color: rgba(184,151,90,0.2);
         }
-        .card:hover .card-img { transform: scale(1.04); }
-        .card:hover .card-arrow { transform: translateX(4px); color: var(--terracotta); }
+        .lc:hover::after { border-color: rgba(184,151,90,0.15); }
+        .lc:hover .lc__img { transform: scale(1.05); }
+        .lc:hover .lc__cta { color: var(--gold); letter-spacing: 0.12em; }
 
-        .card-img-wrap {
-          position: relative; aspect-ratio: 4/3; overflow: hidden;
-          background: var(--cream-dark);
+        /* Image */
+        .lc__img-wrap {
+          position: relative; aspect-ratio: 16/10; overflow: hidden;
+          background: var(--surface-3);
+          flex-shrink: 0;
         }
-        .card-img {
+        .lc__img {
           object-fit: cover;
-          transition: transform 0.5s ease;
+          transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
         }
-        .card-img-placeholder {
+        .lc__no-img {
           width: 100%; height: 100%;
           display: flex; align-items: center; justify-content: center;
-          color: var(--sand); font-size: 32px;
+          color: var(--muted);
         }
 
-        .card-badge {
-          position: absolute; top: 14px; left: 14px;
-          color: white; font-size: 11px; font-weight: 600;
-          padding: 4px 10px; border-radius: 20px;
+        /* Overlay for sold items */
+        .lc__sold-overlay {
+          position: absolute; inset: 0;
+          background: rgba(8,8,8,0.6);
+          display: flex; align-items: center; justify-content: center;
+          backdrop-filter: blur(2px);
+        }
+
+        /* Badges */
+        .lc__badges {
+          position: absolute; top: 12px; left: 12px;
+          display: flex; gap: 6px; flex-wrap: wrap; z-index: 1;
+        }
+        .lc__purpose-badge {
+          padding: 4px 10px; border-radius: 2px;
+          background: rgba(8,8,8,0.75);
+          backdrop-filter: blur(8px);
+          font-size: 10px; font-weight: 600;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: var(--gold); border: 1px solid rgba(184,151,90,0.3);
+        }
+        .lc__featured-badge {
+          padding: 4px 10px; border-radius: 2px;
+          background: rgba(184,151,90,0.2);
+          backdrop-filter: blur(8px);
+          font-size: 10px; font-weight: 600;
+          letter-spacing: 0.06em;
+          color: var(--gold-light); border: 1px solid rgba(184,151,90,0.3);
+        }
+
+        /* Body */
+        .lc__body {
+          padding: 20px; flex: 1;
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .lc__location {
+          display: flex; align-items: center; gap: 5px;
+          font-size: 11px; color: var(--muted);
           letter-spacing: 0.04em; text-transform: uppercase;
         }
-
-        .card-status-overlay {
-          position: absolute; inset: 0;
-          background: rgba(26,22,20,0.55);
-          display: flex; align-items: center; justify-content: center;
-        }
-        .card-status-overlay span {
-          background: rgba(26,22,20,0.8);
-          color: white; font-size: 13px; font-weight: 600;
-          padding: 8px 20px; border-radius: 30px;
-          letter-spacing: 0.06em; text-transform: uppercase;
-        }
-
-        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .card-type  { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-        .card-title {
+        .lc__title {
           font-family: var(--font-display);
-          font-size: 18px; font-weight: 600; color: var(--charcoal);
+          font-size: 18px; font-weight: 400; color: var(--white);
           line-height: 1.3;
           display: -webkit-box; -webkit-line-clamp: 2;
           -webkit-box-orient: vertical; overflow: hidden;
         }
-
-        .card-specs {
+        .lc__specs {
           display: flex; gap: 14px; flex-wrap: wrap;
-          margin-top: 4px;
         }
-        .spec {
+        .lc__spec {
           display: flex; align-items: center; gap: 5px;
-          font-size: 12px; color: var(--muted);
+          font-size: 12px; color: var(--muted-2);
         }
-
-        .card-footer {
-          display: flex; align-items: center; justify-content: space-between;
-          margin-top: auto; padding-top: 12px;
-          border-top: 1px solid var(--cream-dark);
+        .lc__footer {
+          display: flex; align-items: center;
+          justify-content: space-between;
+          margin-top: auto; padding-top: 14px;
+          border-top: 1px solid var(--border);
         }
-        .card-price {
+        .lc__price {
           font-family: var(--font-display);
-          font-size: 18px; font-weight: 600; color: var(--terracotta);
+          font-size: 20px; font-weight: 500; color: var(--gold);
         }
-        .card-arrow {
-          font-size: 18px; color: var(--muted);
-          transition: all 0.25s ease;
+        .lc__cta {
+          font-size: 12px; color: var(--muted);
+          letter-spacing: 0.08em; text-transform: uppercase;
+          transition: all 0.3s ease;
         }
       `}</style>
     </Link>

@@ -51,44 +51,64 @@ export default async function ListingsPage({ params, searchParams }: Props) {
     vacances: "Locations Vacances",
   };
 
+  const SUBTITLES: Record<ListingPurpose, string> = {
+    vente:    "Appartements, villas et maisons à acquérir",
+    location: "Location longue durée au nord du Maroc",
+    vacances: "Séjours et courts séjours en bord de mer",
+  };
+
   return (
-    <div className="lp-root">
-      <div className="lp-hero">
+    <div className="lp page-enter">
+
+      {/* Hero header */}
+      <div className="lp__hero">
         <div className="container">
-          <span className="lp-eyebrow">Immobilier</span>
-          <h1 className="lp-title">{TITLES[purpose as ListingPurpose]}</h1>
-          <p className="lp-sub">{total} bien{total !== 1 ? "s" : ""} disponible{total !== 1 ? "s" : ""}</p>
+          <span className="eyebrow">Immobilier</span>
+          <h1 className="lp__title">{TITLES[purpose as ListingPurpose]}</h1>
+          <p className="lp__sub">{SUBTITLES[purpose as ListingPurpose]}</p>
+          <div className="lp__meta">
+            <span className="lp__count-pill">
+              <span className="lp__count-dot" />
+              {total} bien{total !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="container lp-body">
-        <aside className="lp-sidebar">
-          <ListingFilters
-            purpose={purpose as ListingPurpose}
-            currentFilters={sp}
-          />
+      {/* Body: sidebar + grid */}
+      <div className="container lp__body">
+
+        {/* Sidebar filters */}
+        <aside className="lp__sidebar">
+          <ListingFilters purpose={purpose as ListingPurpose} currentFilters={sp} />
         </aside>
 
-        <div className="lp-content">
+        {/* Results */}
+        <div className="lp__content">
           {listings.length === 0 ? (
-            <div className="lp-empty">
-              <span className="lp-empty-icon">🔍</span>
+            <div className="lp__empty">
+              <span className="lp__empty-icon">○</span>
               <h3>Aucun bien trouvé</h3>
-              <p>Essayez de modifier vos filtres pour voir plus de résultats.</p>
+              <p>Modifiez vos filtres pour voir plus de résultats.</p>
             </div>
           ) : (
             <>
-              {/* Results header */}
-              <div className="lp-results-header">
-                <p className="lp-results-count">
+              <div className="lp__results-bar">
+                <p className="lp__results-count">
                   {total} bien{total !== 1 ? "s" : ""}
-                  {totalPages > 1 && ` · Page ${page} sur ${totalPages}`}
+                  {totalPages > 1 && (
+                    <span className="lp__page-info"> · Page {page} sur {totalPages}</span>
+                  )}
                 </p>
               </div>
 
-              <div className="lp-grid stagger">
+              <div className="lp__grid">
                 {listings.map((listing, i) => (
-                  <div key={listing.id} className="anim-fade-up">
+                  <div
+                    key={listing.id}
+                    className="reveal"
+                    style={{ transitionDelay: `${i * 0.06}s` }}
+                  >
                     <ListingCard listing={listing} priority={i < 3} />
                   </div>
                 ))}
@@ -106,58 +126,91 @@ export default async function ListingsPage({ params, searchParams }: Props) {
       </div>
 
       <style>{`
-        .lp-hero {
-          background: var(--charcoal);
-          padding: 120px 0 48px;
+        /* ── Hero ─────────────────────────────────── */
+        .lp__hero {
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          padding: calc(var(--nav-h) + 60px) 0 52px;
+          position: relative; overflow: hidden;
         }
-        .lp-eyebrow {
-          display: block; font-size: 11px; font-weight: 600;
-          color: var(--terra-light); text-transform: uppercase;
-          letter-spacing: 0.12em; margin-bottom: 12px;
+        .lp__hero::before {
+          content: '';
+          position: absolute; inset: 0;
+          background: radial-gradient(ellipse at 20% 50%, rgba(184,151,90,0.06) 0%, transparent 60%);
+          pointer-events: none;
         }
-        .lp-title {
-          font-family: var(--font-display);
-          font-size: clamp(36px, 5vw, 56px); font-weight: 600;
-          color: var(--cream); margin-bottom: 8px;
+        .lp__title {
+          font-size: clamp(36px, 5vw, 60px);
+          font-weight: 400; color: var(--white);
+          margin-bottom: 10px; margin-top: 8px;
         }
-        .lp-sub { font-size: 15px; color: var(--muted); }
+        .lp__sub {
+          font-size: 15px; color: var(--muted);
+          margin-bottom: 24px; letter-spacing: 0.01em;
+        }
+        .lp__meta { display: flex; align-items: center; gap: 12px; }
+        .lp__count-pill {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgba(184,151,90,0.1);
+          border: 1px solid rgba(184,151,90,0.2);
+          color: var(--gold); font-size: 12px; font-weight: 500;
+          padding: 6px 14px; border-radius: 30px;
+          letter-spacing: 0.04em;
+        }
+        .lp__count-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: var(--gold); flex-shrink: 0;
+        }
 
-        .lp-body {
+        /* ── Layout ───────────────────────────────── */
+        .lp__body {
           display: grid;
           grid-template-columns: 280px 1fr;
-          gap: 40px; padding-top: 40px; padding-bottom: 80px;
+          gap: 40px;
+          padding-top: 48px; padding-bottom: 100px;
           align-items: start;
         }
-        @media (max-width: 960px) {
-          .lp-body { grid-template-columns: 1fr; }
-          .lp-sidebar { display: none; }
+        @media (max-width: 1024px) {
+          .lp__body { grid-template-columns: 1fr; }
+          .lp__sidebar { display: none; }
         }
+        .lp__sidebar { position: sticky; top: calc(var(--nav-h) + 20px); }
 
-        .lp-sidebar { position: sticky; top: 90px; }
-
-        .lp-results-header {
-          display: flex; align-items: center; justify-content: space-between;
-          margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+        /* ── Results ──────────────────────────────── */
+        .lp__results-bar {
+          display: flex; align-items: center;
+          justify-content: space-between;
+          margin-bottom: 28px;
         }
-        .lp-results-count { font-size: 14px; color: var(--muted); }
+        .lp__results-count {
+          font-size: 13px; color: var(--muted);
+          letter-spacing: 0.02em;
+        }
+        .lp__page-info { color: var(--muted); }
 
-        .lp-grid {
+        .lp__grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 24px;
+          gap: 20px;
         }
+        @media (max-width: 640px) { .lp__grid { grid-template-columns: 1fr; } }
 
-        .lp-empty {
+        /* ── Empty ────────────────────────────────── */
+        .lp__empty {
           padding: 80px 40px; text-align: center;
-          background: var(--white); border-radius: var(--radius-lg);
           border: 1px solid var(--border);
+          border-radius: var(--r-lg);
+          background: var(--surface-2);
         }
-        .lp-empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
-        .lp-empty h3 {
-          font-family: var(--font-display); font-size: 24px;
-          color: var(--charcoal); margin-bottom: 8px;
+        .lp__empty-icon {
+          display: block; font-size: 48px; color: var(--muted);
+          margin-bottom: 20px;
         }
-        .lp-empty p { color: var(--muted); font-size: 15px; }
+        .lp__empty h3 {
+          font-family: var(--font-display);
+          font-size: 24px; color: var(--white); margin-bottom: 8px;
+        }
+        .lp__empty p { font-size: 14px; color: var(--muted); }
       `}</style>
     </div>
   );

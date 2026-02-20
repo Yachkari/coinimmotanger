@@ -1,6 +1,5 @@
 import { getDashboardStats, getListings, getContactMessages } from "@/lib/supabase/queries";
 import { formatPrice, relativeTime } from "@/lib/utils";
-
 import Link from "next/link";
 import {
   Building2, CheckCircle2, XCircle,
@@ -12,291 +11,273 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const [statsRes, listingsRes, messagesRes] = await Promise.all([
     getDashboardStats(),
-    getListings({ limit: 5, orderBy: "date_desc", status: undefined as any }),
-    getContactMessages(true), // unread only
+    getListings({ limit: 6, orderBy: "date_desc", status: undefined as any }),
+    getContactMessages(true),
   ]);
 
   const stats    = statsRes.data;
   const listings = listingsRes.data?.listings ?? [];
   const messages = messagesRes.data ?? [];
 
-  const STAT_CARDS = [
-    {
-      label: "Total annonces",
-      value: stats?.totalListings     ?? 0,
-      icon:  Building2,
-      color: "#c9a84c",
-      bg:    "rgba(201,168,76,0.08)",
-    },
-    {
-      label: "Disponibles",
-      value: stats?.availableListings ?? 0,
-      icon:  CheckCircle2,
-      color: "#4caf82",
-      bg:    "rgba(76,175,130,0.08)",
-    },
-    {
-      label: "Vendus / Loués",
-      value: (stats?.soldListings ?? 0) + (stats?.rentedListings ?? 0),
-      icon:  XCircle,
-      color: "#e07b52",
-      bg:    "rgba(224,123,82,0.08)",
-    },
-    {
-      label: "En vedette",
-      value: stats?.featuredListings  ?? 0,
-      icon:  Star,
-      color: "#a07cdb",
-      bg:    "rgba(160,124,219,0.08)",
-    },
-    {
-      label: "Messages non lus",
-      value: stats?.unreadMessages    ?? 0,
-      icon:  MessageSquare,
-      color: "#52a8e0",
-      bg:    "rgba(82,168,224,0.08)",
-    },
+  const STATS = [
+    { label: "Total annonces",   value: stats?.totalListings     ?? 0, icon: Building2,    color: "#c9a84c", },
+    { label: "Disponibles",      value: stats?.availableListings ?? 0, icon: CheckCircle2, color: "#4caf82", },
+    { label: "Vendus / Loués",   value: (stats?.soldListings ?? 0) + (stats?.rentedListings ?? 0), icon: XCircle, color: "#e07b52", },
+    { label: "En vedette",       value: stats?.featuredListings  ?? 0, icon: Star,         color: "#a07cdb", },
+    { label: "Messages non lus", value: stats?.unreadMessages    ?? 0, icon: MessageSquare,color: "#52a8e0", },
   ];
 
   return (
-    <div className="dash">
+    <div className="dp">
 
-      {/* Header */}
-      <div className="dash-header">
+      {/* ── Header ── */}
+      <div className="dp__header">
         <div>
-          <h1 className="dash-title">Tableau de bord</h1>
-          <p className="dash-sub">Bienvenue — voici un aperçu de votre activité</p>
+          <span className="dp__eyebrow">◆ Tableau de bord</span>
+          <h1 className="dp__title">Aperçu de l'activité</h1>
         </div>
-        <Link href="/dashboard/listings/new" className="dash-cta">
-          <PlusCircle size={16} />
+        <Link href="/dashboard/listings/new" className="dp__cta">
+          <PlusCircle size={14} />
           Nouvelle annonce
         </Link>
       </div>
 
-      {/* Stat cards */}
-      <div className="stats-grid">
-        {STAT_CARDS.map(({ label, value, icon: Icon, color, bg }) => (
-          <div key={label} className="stat-card">
-            <div className="stat-icon" style={{ background: bg, color }}>
-              <Icon size={20} />
+      {/* ── Stat strip ── */}
+      <div className="dp__stats">
+        {STATS.map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="dp__stat">
+            <div className="dp__stat-bar" style={{ background: color }} />
+            <div className="dp__stat-icon" style={{ color }}>
+              <Icon size={16} />
             </div>
-            <div className="stat-body">
-              <div className="stat-value" style={{ color }}>{value}</div>
-              <div className="stat-label">{label}</div>
-            </div>
+            <div className="dp__stat-val" style={{ color }}>{value}</div>
+            <div className="dp__stat-label">{label}</div>
           </div>
         ))}
       </div>
 
-      {/* Two column section */}
-      <div className="dash-grid">
+      {/* ── Two panels ── */}
+      <div className="dp__grid">
 
         {/* Recent listings */}
-        <div className="dash-panel">
-          <div className="panel-header">
-            <div className="panel-title">
-              <TrendingUp size={16} />
+        <div className="dp__panel">
+          <div className="dp__panel-hd">
+            <span className="dp__panel-title">
+              <TrendingUp size={13} />
               Annonces récentes
-            </div>
-            <Link href="/dashboard/listings" className="panel-link">
-              Tout voir <ArrowRight size={14} />
+            </span>
+            <Link href="/dashboard/listings" className="dp__panel-link">
+              Tout voir <ArrowRight size={12} />
             </Link>
           </div>
-
-          <div className="listing-list">
-            {listings.length === 0 && (
-              <p className="empty-state">Aucune annonce pour l'instant.</p>
-            )}
-            {listings.map((l) => (
-              <Link
-                key={l.id}
-                href={`/dashboard/listings/${l.id}/edit`}
-                className="listing-row"
-              >
-                <div className="listing-row-info">
-                  <span className="listing-row-title">{l.title}</span>
-                  <span className="listing-row-meta">
-                    {l.city} · {relativeTime(l.created_at)}
-                  </span>
-                </div>
-                <div className="listing-row-right">
-                  <span className="listing-row-price">
-                    {formatPrice(l.price, l.price_period)}
-                  </span>
-                  <span
-                    className={`listing-row-badge ${l.status}`}
-                  >
-                    {l.status}
-                  </span>
-                </div>
-              </Link>
-            ))}
+          <div className="dp__list">
+            {listings.length === 0
+              ? <p className="dp__empty">Aucune annonce pour l'instant.</p>
+              : listings.map((l) => (
+                <Link key={l.id} href={`/dashboard/listings/${l.id}/edit`} className="dp__row">
+                  <div className="dp__row-left">
+                    <span className="dp__row-title">{l.title}</span>
+                    <span className="dp__row-meta">{l.city} · {relativeTime(l.created_at)}</span>
+                  </div>
+                  <div className="dp__row-right">
+                    <span className="dp__row-price">{formatPrice(l.price, l.price_period)}</span>
+                    <span className={`dp__badge dp__badge--${l.status}`}>{l.status}</span>
+                  </div>
+                </Link>
+              ))
+            }
           </div>
         </div>
 
-        {/* Unread messages */}
-        <div className="dash-panel">
-          <div className="panel-header">
-            <div className="panel-title">
-              <MessageSquare size={16} />
+        {/* Messages */}
+        <div className="dp__panel">
+          <div className="dp__panel-hd">
+            <span className="dp__panel-title">
+              <MessageSquare size={13} />
               Messages non lus
-              {messages.length > 0 && (
-                <span className="badge-count">{messages.length}</span>
-              )}
-            </div>
-            <Link href="/dashboard/messages" className="panel-link">
-              Tout voir <ArrowRight size={14} />
+              {messages.length > 0 && <span className="dp__count">{messages.length}</span>}
+            </span>
+            <Link href="/dashboard/messages" className="dp__panel-link">
+              Tout voir <ArrowRight size={12} />
             </Link>
           </div>
-
-          <div className="message-list">
-            {messages.length === 0 && (
-              <p className="empty-state">Aucun nouveau message.</p>
-            )}
-            {messages.slice(0, 5).map((m) => (
-              <Link
-                key={m.id}
-                href="/dashboard/messages"
-                className="message-row"
-              >
-                <div className="msg-avatar">
-                  {m.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="msg-body">
-                  <span className="msg-name">{m.name}</span>
-                  <span className="msg-preview">{m.message.slice(0, 60)}…</span>
-                </div>
-                <span className="msg-time">{relativeTime(m.created_at)}</span>
-              </Link>
-            ))}
+          <div className="dp__list">
+            {messages.length === 0
+              ? <p className="dp__empty">Aucun nouveau message.</p>
+              : messages.slice(0, 6).map((m) => (
+                <Link key={m.id} href="/dashboard/messages" className="dp__row dp__row--msg">
+                  <div className="dp__avatar">{m.name.charAt(0).toUpperCase()}</div>
+                  <div className="dp__msg-body">
+                    <span className="dp__row-title">{m.name}</span>
+                    <span className="dp__row-meta">{m.message.slice(0, 55)}…</span>
+                  </div>
+                  <span className="dp__msg-time">{relativeTime(m.created_at)}</span>
+                </Link>
+              ))
+            }
           </div>
         </div>
 
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;600&family=Playfair+Display:wght@600&display=swap');
+        .dp { color: #d8d5cf; animation: fadeUp .3s ease both; }
 
-        .dash { font-family: 'DM Sans', sans-serif; color: #e0e0e0; max-width: 1100px; }
-
-        .dash-header {
-          display: flex; align-items: flex-start;
-          justify-content: space-between; flex-wrap: wrap;
-          gap: 16px; margin-bottom: 32px;
+        /* Header */
+        .dp__header {
+          display: flex; align-items: flex-end; justify-content: space-between;
+          flex-wrap: wrap; gap: 16px;
+          padding-bottom: 28px; margin-bottom: 28px;
+          border-bottom: 1px solid #1a1a1a;
         }
-        .dash-title {
+        .dp__eyebrow {
+          display: block; font-size: 9px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.22em;
+          color: #c9a84c; margin-bottom: 6px;
+        }
+        .dp__title {
           font-family: 'Playfair Display', serif;
-          font-size: 28px; color: #f0f0f0; margin-bottom: 4px;
+          font-size: 28px; font-weight: 400; color: #f0ece4;
+          margin: 0; line-height: 1.1;
         }
-        .dash-sub { font-size: 14px; color: #555; }
-
-        .dash-cta {
-          display: flex; align-items: center; gap: 8px;
-          background: #c9a84c; color: #0a0a0a;
-          text-decoration: none; padding: 10px 18px;
-          border-radius: 8px; font-size: 14px; font-weight: 600;
-          transition: all 0.15s ease; white-space: nowrap;
+        .dp__cta {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: #c9a84c; color: #080808;
+          text-decoration: none; padding: 10px 20px;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          transition: all .2s ease;
+          border: 1px solid transparent;
         }
-        .dash-cta:hover { background: #d4b45a; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.25); }
+        .dp__cta:hover {
+          background: #d4b45a;
+          box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+        }
 
         /* Stats */
-        .stats-grid {
+        .dp__stats {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-          gap: 16px; margin-bottom: 28px;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 1px;
+          background: #1a1a1a;
+          border: 1px solid #1a1a1a;
+          margin-bottom: 28px;
         }
-        .stat-card {
-          background: #141414; border: 1px solid #1f1f1f;
-          border-radius: 12px; padding: 20px;
-          display: flex; align-items: center; gap: 16px;
-          transition: border-color 0.15s ease;
+        .dp__stat {
+          background: #0f0f0f; padding: 20px 20px 18px;
+          position: relative; overflow: hidden;
+          transition: background .2s ease;
         }
-        .stat-card:hover { border-color: #2a2a2a; }
-        .stat-icon {
-          width: 44px; height: 44px; border-radius: 10px;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
+        .dp__stat:hover { background: #111; }
+        .dp__stat-bar {
+          position: absolute; top: 0; left: 0; right: 0; height: 2px;
+          opacity: .6;
         }
-        .stat-value { font-size: 26px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: #555; }
+        .dp__stat-icon {
+          margin-bottom: 12px; opacity: .7;
+        }
+        .dp__stat-val {
+          font-family: 'Playfair Display', serif;
+          font-size: 30px; font-weight: 400; line-height: 1;
+          margin-bottom: 6px;
+        }
+        .dp__stat-label {
+          font-size: 10px; color: #555;
+          text-transform: uppercase; letter-spacing: .1em;
+        }
+        @media (max-width: 900px) {
+          .dp__stats { grid-template-columns: repeat(3,1fr); }
+        }
 
-        /* Two-column grid */
-        .dash-grid {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 20px;
+        /* Grid */
+        .dp__grid {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
         }
-        @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 860px) { .dp__grid { grid-template-columns: 1fr; } }
 
-        .dash-panel {
-          background: #141414; border: 1px solid #1f1f1f;
-          border-radius: 12px; overflow: hidden;
+        /* Panel */
+        .dp__panel {
+          background: #0f0f0f; border: 1px solid #1a1a1a;
+          overflow: hidden;
         }
-        .panel-header {
+        .dp__panel-hd {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 18px 20px; border-bottom: 1px solid #1f1f1f;
+          padding: 14px 18px;
+          border-bottom: 1px solid #161616;
+          background: #0a0a0a;
         }
-        .panel-title {
-          display: flex; align-items: center; gap: 8px;
-          font-size: 14px; font-weight: 500; color: #c0c0c0;
+        .dp__panel-title {
+          display: flex; align-items: center; gap: 7px;
+          font-size: 10px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: .16em; color: #666;
         }
-        .panel-link {
+        .dp__panel-title svg { color: #c9a84c; }
+        .dp__panel-link {
           display: flex; align-items: center; gap: 4px;
-          font-size: 12px; color: #c9a84c; text-decoration: none;
+          font-size: 10px; color: #c9a84c; text-decoration: none;
+          text-transform: uppercase; letter-spacing: .1em;
+          opacity: .8; transition: opacity .15s ease;
         }
-        .panel-link:hover { color: #d4b45a; }
+        .dp__panel-link:hover { opacity: 1; }
 
-        .badge-count {
-          background: #c9a84c; color: #0a0a0a;
-          font-size: 11px; font-weight: 700;
-          padding: 1px 7px; border-radius: 20px; margin-left: 4px;
+        .dp__count {
+          background: #c9a84c; color: #080808;
+          font-size: 9px; font-weight: 800;
+          padding: 1px 6px; margin-left: 4px;
         }
 
-        /* Listing rows */
-        .listing-list { display: flex; flex-direction: column; }
-        .listing-row {
+        /* Rows */
+        .dp__list { display: flex; flex-direction: column; }
+        .dp__row {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 14px 20px; text-decoration: none;
-          border-bottom: 1px solid #1a1a1a; gap: 12px;
-          transition: background 0.1s ease;
+          padding: 13px 18px; text-decoration: none;
+          border-bottom: 1px solid #141414; gap: 12px;
+          transition: background .1s ease;
         }
-        .listing-row:last-child { border-bottom: none; }
-        .listing-row:hover { background: #1a1a1a; }
-        .listing-row-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .listing-row-title { font-size: 13px; color: #d0d0d0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .listing-row-meta  { font-size: 11px; color: #555; }
-        .listing-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-        .listing-row-price { font-size: 12px; color: #c9a84c; font-weight: 500; white-space: nowrap; }
-        .listing-row-badge {
-          font-size: 10px; font-weight: 600; padding: 2px 8px;
-          border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
+        .dp__row:last-child { border-bottom: none; }
+        .dp__row:hover { background: rgba(255,255,255,.02); }
+
+        .dp__row-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .dp__row-title {
+          font-size: 13px; color: #c8c5be; font-weight: 500;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .listing-row-badge.disponible { background: rgba(76,175,130,0.15); color: #4caf82; }
-        .listing-row-badge.vendu      { background: rgba(224,82,82,0.15);  color: #e05252; }
-        .listing-row-badge.loue       { background: rgba(224,123,82,0.15); color: #e07b52; }
-        .listing-row-badge.reserve    { background: rgba(201,168,76,0.15); color: #c9a84c; }
+        .dp__row-meta { font-size: 11px; color: #444; }
+
+        .dp__row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+        .dp__row-price { font-size: 12px; color: #c9a84c; font-weight: 600; white-space: nowrap; }
+
+        .dp__badge {
+          font-size: 9px; font-weight: 700; padding: 2px 7px;
+          text-transform: uppercase; letter-spacing: .08em;
+        }
+        .dp__badge--disponible { background: rgba(76,175,130,.12); color: #4caf82; }
+        .dp__badge--vendu      { background: rgba(192,82,82,.12);  color: #c05252; }
+        .dp__badge--loue       { background: rgba(224,123,82,.12); color: #e07b52; }
+        .dp__badge--reserve    { background: rgba(201,168,76,.12); color: #c9a84c; }
 
         /* Message rows */
-        .message-list { display: flex; flex-direction: column; }
-        .message-row {
-          display: flex; align-items: center; gap: 14px;
-          padding: 14px 20px; text-decoration: none;
-          border-bottom: 1px solid #1a1a1a;
-          transition: background 0.1s ease;
-        }
-        .message-row:last-child { border-bottom: none; }
-        .message-row:hover { background: #1a1a1a; }
-        .msg-avatar {
-          width: 36px; height: 36px; border-radius: 50%;
-          background: rgba(201,168,76,0.15); color: #c9a84c;
+        .dp__row--msg { align-items: flex-start; }
+        .dp__avatar {
+          width: 32px; height: 32px; flex-shrink: 0;
+          background: rgba(201,168,76,.1);
+          border: 1px solid rgba(201,168,76,.2);
+          color: #c9a84c; font-size: 13px; font-weight: 700;
           display: flex; align-items: center; justify-content: center;
-          font-size: 14px; font-weight: 600; flex-shrink: 0;
         }
-        .msg-body { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .msg-name    { font-size: 13px; color: #d0d0d0; font-weight: 500; }
-        .msg-preview { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .msg-time    { font-size: 11px; color: #444; flex-shrink: 0; }
+        .dp__msg-body { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .dp__msg-time { font-size: 10px; color: #444; flex-shrink: 0; margin-top: 2px; }
 
-        .empty-state { padding: 32px 20px; text-align: center; color: #444; font-size: 13px; }
+        .dp__empty {
+          padding: 36px 18px; text-align: center;
+          color: #333; font-size: 12px;
+          text-transform: uppercase; letter-spacing: .1em;
+        }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
     </div>
   );

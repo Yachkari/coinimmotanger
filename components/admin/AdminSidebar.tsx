@@ -3,19 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Building2,
-  PlusCircle,
-  MessageSquare,
-  LogOut,
-  Home,
+  LayoutDashboard, Building2, PlusCircle,
+  MessageSquare, LogOut, ExternalLink,
 } from "lucide-react";
 
 const NAV = [
-  { href: "/dashboard",           icon: LayoutDashboard, label: "Tableau de bord" },
-  { href: "/dashboard/listings",  icon: Building2,       label: "Annonces"        },
-  { href: "/dashboard/listings/new", icon: PlusCircle,   label: "Nouvelle annonce"},
-  { href: "/dashboard/messages",  icon: MessageSquare,   label: "Messages"        },
+  { href: "/dashboard",              icon: LayoutDashboard, label: "Tableau de bord", exact: true  },
+  { href: "/dashboard/listings",     icon: Building2,       label: "Annonces",        exact: false },
+  { href: "/dashboard/listings/new", icon: PlusCircle,      label: "Nouvelle",        exact: false },
+  { href: "/dashboard/messages",     icon: MessageSquare,   label: "Messages",        exact: false },
 ];
 
 export default function AdminSidebar() {
@@ -27,127 +23,145 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="sidebar">
+    <aside className="sb">
+
       {/* Logo */}
-      <div className="sidebar-logo">
-        <span className="logo-icon">◆</span>
-        <span className="logo-text">Admin</span>
+      <div className="sb__logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="currentColor" strokeWidth="1.2"/>
+          <path d="M12 2v20M2 7l10 5 10-5" stroke="currentColor" strokeWidth="1.2"/>
+        </svg>
+        <div>
+          <span className="sb__logo-name">
+            {process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
+          </span>
+          <span className="sb__logo-tag">Administration</span>
+        </div>
       </div>
 
-      {/* Nav links */}
-      <nav className="sidebar-nav">
-        {NAV.map(({ href, icon: Icon, label }) => {
-          const active =
-            href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(href);
+      {/* Divider */}
+      <div className="sb__divider" />
 
+      {/* Nav */}
+      <nav className="sb__nav">
+        <span className="sb__nav-label">Navigation</span>
+        {NAV.map(({ href, icon: Icon, label, exact }) => {
+          const active = exact ? pathname === href : pathname.startsWith(href);
           return (
-            <Link key={href} href={href} className={`nav-item ${active ? "active" : ""}`}>
-              <Icon size={18} />
+            <Link key={href} href={href} className={`sb__item ${active ? "sb__item--active" : ""}`}>
+              <span className="sb__item-indicator" />
+              <Icon size={15} />
               <span>{label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom actions */}
-      <div className="sidebar-footer">
-        <Link href="/" target="_blank" className="nav-item footer-link">
-          <Home size={18} />
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Footer */}
+      <div className="sb__footer">
+        <a href="/" target="_blank" rel="noopener noreferrer" className="sb__footer-link">
+          <ExternalLink size={13} />
           <span>Voir le site</span>
-        </Link>
-        <button onClick={handleLogout} className="nav-item logout-btn">
-          <LogOut size={18} />
+        </a>
+        <button onClick={handleLogout} className="sb__footer-link sb__footer-link--danger">
+          <LogOut size={13} />
           <span>Déconnexion</span>
         </button>
       </div>
 
       <style>{`
-        .sidebar {
-          position: fixed;
-          top: 0; left: 0;
-          width: 260px;
-          height: 100vh;
-          background: #141414;
-          border-right: 1px solid #1f1f1f;
-          display: flex;
-          flex-direction: column;
+        .sb {
+          position: fixed; top: 0; left: 0;
+          width: 220px; height: 100vh;
+          background: #0a0a0a;
+          border-right: 1px solid #1a1a1a;
+          display: flex; flex-direction: column;
           z-index: 100;
-          padding: 0;
         }
 
-        .sidebar-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 28px 24px 24px;
-          border-bottom: 1px solid #1f1f1f;
+        /* Logo */
+        .sb__logo {
+          display: flex; align-items: center; gap: 12px;
+          padding: 24px 20px 22px;
         }
-        .logo-icon {
-          color: #c9a84c;
-          font-size: 20px;
-          line-height: 1;
-        }
-        .logo-text {
+        .sb__logo svg { color: #c9a84c; flex-shrink: 0; }
+        .sb__logo-name {
+          display: block;
           font-family: 'Playfair Display', serif;
-          font-size: 18px;
-          font-weight: 600;
-          color: #f5f5f5;
-          letter-spacing: 0.03em;
+          font-size: 15px; color: #f0f0f0;
+          letter-spacing: 0.03em; line-height: 1.2;
+        }
+        .sb__logo-tag {
+          display: block;
+          font-size: 9px; color: #444;
+          text-transform: uppercase; letter-spacing: 0.15em;
+          margin-top: 2px;
         }
 
-        .sidebar-nav {
-          flex: 1;
-          padding: 16px 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
+        .sb__divider {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #1f1f1f 30%, #1f1f1f 70%, transparent);
+          margin: 0 20px;
         }
 
-        .nav-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 10px 14px;
-          border-radius: 8px;
-          color: #888;
-          font-size: 14px;
-          font-weight: 450;
-          text-decoration: none;
-          transition: all 0.15s ease;
-          cursor: pointer;
-          background: none;
-          border: none;
-          width: 100%;
-          text-align: left;
+        /* Nav */
+        .sb__nav {
+          padding: 20px 12px 8px;
+          display: flex; flex-direction: column; gap: 2px;
         }
-        .nav-item:hover {
-          background: #1a1a1a;
-          color: #e0e0e0;
-        }
-        .nav-item.active {
-          background: rgba(201, 168, 76, 0.12);
-          color: #c9a84c;
-        }
-        .nav-item.active svg {
-          color: #c9a84c;
+        .sb__nav-label {
+          font-size: 9px; font-weight: 600;
+          text-transform: uppercase; letter-spacing: 0.18em;
+          color: #333; padding: 0 8px; margin-bottom: 8px;
+          display: block;
         }
 
-        .sidebar-footer {
+        .sb__item {
+          display: flex; align-items: center; gap: 10px;
+          padding: 9px 8px 9px 12px;
+          color: #555; font-size: 13px; font-weight: 400;
+          text-decoration: none; position: relative;
+          transition: color 0.15s ease, background 0.15s ease;
+          border: 1px solid transparent;
+        }
+        .sb__item-indicator {
+          position: absolute; left: 0; top: 50%;
+          transform: translateY(-50%);
+          width: 2px; height: 0;
+          background: #c9a84c;
+          transition: height 0.2s ease;
+        }
+        .sb__item:hover {
+          color: #c0c0c0;
+          background: #111;
+          border-color: #1a1a1a;
+        }
+        .sb__item--active {
+          color: #c9a84c !important;
+          background: rgba(201,168,76,0.06) !important;
+          border-color: rgba(201,168,76,0.15) !important;
+        }
+        .sb__item--active .sb__item-indicator { height: 60%; }
+
+        /* Footer */
+        .sb__footer {
           padding: 12px;
-          border-top: 1px solid #1f1f1f;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
+          border-top: 1px solid #141414;
+          display: flex; flex-direction: column; gap: 2px;
         }
-        .footer-link { color: #666; font-size: 13px; }
-        .logout-btn  { color: #666; font-size: 13px; }
-        .logout-btn:hover { color: #e05252; background: rgba(224,82,82,0.08); }
-
-        @media (max-width: 768px) {
-          .sidebar { transform: translateX(-100%); }
+        .sb__footer-link {
+          display: flex; align-items: center; gap: 8px;
+          padding: 8px 10px; color: #444; font-size: 12px;
+          text-decoration: none; background: none; border: none;
+          cursor: pointer; font-family: 'DM Sans', sans-serif;
+          transition: color 0.15s ease;
+          text-align: left; width: 100%;
         }
+        .sb__footer-link:hover { color: #888; }
+        .sb__footer-link--danger:hover { color: #c05252; }
       `}</style>
     </aside>
   );

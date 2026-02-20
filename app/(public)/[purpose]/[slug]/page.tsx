@@ -1,13 +1,12 @@
 import { getListingBySlug, getRelatedListings } from "@/lib/supabase/queries";
 import { getListingMetadata, getListingStructuredData } from "@/lib/seo";
-import { formatPrice, formatSurface, formatFloor, formatType, formatPurpose, formatStatus } from "@/lib/utils";
+import { formatPrice, formatSurface, formatFloor, formatType, formatPurpose } from "@/lib/utils";
 import { getListingAmenities } from "@/constants/amenities";
-import type { ListingPurpose } from "@/types";
 import ContactForm from "@/components/contact/ContactForm";
 import ListingCard from "@/components/listings/ListingCard";
 import ListingGallery from "@/components/listings/ListingGallery";
 import { notFound } from "next/navigation";
-import { MapPin, Maximize2, Bed, Bath, Layers, ArrowLeft } from "lucide-react";
+import { MapPin, Maximize2, Bed, Bath, Layers, ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -27,12 +26,17 @@ export default async function ListingDetailPage({ params }: Props) {
 
   if (!result.data) notFound();
 
-  const listing  = result.data;
-  const related  = await getRelatedListings(listing, 3);
-  const amenities = getListingAmenities(listing.amenities ?? []);
+  const listing    = result.data;
+  const related    = await getRelatedListings(listing, 3);
+  const amenities  = getListingAmenities(listing.amenities ?? []);
   const structured = getListingStructuredData(listing);
-  const { label: statusLabel, color: statusColor } = formatStatus(listing.status);
-  const images = (listing.listing_images ?? []).sort((a, b) => a.order - b.order);
+  const images     = (listing.listing_images ?? []).sort((a, b) => a.order - b.order);
+
+  const STATUS_MAP: Record<string, string> = {
+    vendu:   "badge-vendu",
+    loue:    "badge-loue",
+    reserve: "badge-reserve",
+  };
 
   return (
     <>
@@ -41,114 +45,122 @@ export default async function ListingDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }}
       />
 
-      <div className="dp-root">
+      <div className="dp page-enter">
 
-        {/* ── Breadcrumb ─── */}
-        <div className="dp-breadcrumb">
-          <div className="container dp-breadcrumb-inner">
-            <Link href={`/${purpose}`} className="dp-back">
-              <ArrowLeft size={16} />
+        {/* ── Gallery — full width cinematic ── */}
+        <ListingGallery images={images} title={listing.title} />
+
+        {/* ── Breadcrumb ── */}
+        <div className="dp__breadcrumb">
+          <div className="container dp__breadcrumb-inner">
+            <Link href={`/${purpose}`} className="dp__back">
+              <ArrowLeft size={14} />
               {formatPurpose(listing.purpose)}
             </Link>
-            <span className="dp-bc-sep">/</span>
-            <span className="dp-bc-current">{listing.title}</span>
+            <span className="dp__bc-sep">/</span>
+            <span className="dp__bc-cur">{listing.city}</span>
           </div>
         </div>
 
-        {/* ── Gallery ─── */}
-        <ListingGallery images={images} title={listing.title} />
+        {/* ── Main layout ── */}
+        <div className="container dp__body">
 
-        {/* ── Main content ─── */}
-        <div className="container dp-body">
-
-          {/* Left — details */}
-          <div className="dp-main">
+          {/* Left — listing info */}
+          <div className="dp__main">
 
             {/* Header */}
-            <div className="dp-header">
-              <div className="dp-badges">
-                <span className="dp-purpose-badge">{formatPurpose(listing.purpose)}</span>
-                <span className="dp-type-badge">{formatType(listing.type)}</span>
+            <div className="dp__header">
+              {/* Badges row */}
+              <div className="dp__badges">
+                <span className="dp__purpose-badge">{formatPurpose(listing.purpose)}</span>
+                <span className="dp__type-badge">{formatType(listing.type)}</span>
                 {listing.status !== "disponible" && (
-                  <span className="dp-status-badge" style={{
-                    background: statusColor.includes("green")  ? "rgba(76,175,130,0.1)"  :
-                                statusColor.includes("red")    ? "rgba(224,82,82,0.1)"   :
-                                                                 "rgba(201,168,76,0.1)",
-                    color:      statusColor.includes("green")  ? "#4caf82"  :
-                                statusColor.includes("red")    ? "#e05252"  :
-                                                                 "#c9a84c",
-                  }}>
-                    {statusLabel}
+                  <span className={`badge ${STATUS_MAP[listing.status] ?? ""}`}>
+                    {listing.status}
                   </span>
                 )}
               </div>
 
-              <h1 className="dp-title">{listing.title}</h1>
+              <h1 className="dp__title">{listing.title}</h1>
 
-              <div className="dp-location">
-                <MapPin size={15} />
-                <span>{listing.city}{listing.neighborhood ? `, ${listing.neighborhood}` : ""}</span>
+              <div className="dp__location">
+                <MapPin size={14} style={{ color: "var(--gold)" }} />
+                {listing.city}{listing.neighborhood ? `, ${listing.neighborhood}` : ""}
+                {listing.address && <span className="dp__address">· {listing.address}</span>}
               </div>
 
-              <div className="dp-price">
-                {formatPrice(listing.price, listing.price_period)}
+              <div className="dp__price-row">
+                <span className="dp__price">
+                  {formatPrice(listing.price, listing.price_period)}
+                </span>
+                <a
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dp__wa-quick"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  WhatsApp
+                </a>
               </div>
             </div>
 
-            {/* Key specs */}
-            <div className="dp-specs">
+            {/* Specs bar */}
+            <div className="dp__specs">
               {listing.surface && (
-                <div className="dp-spec">
-                  <Maximize2 size={20} />
-                  <span className="dp-spec-val">{formatSurface(listing.surface)}</span>
-                  <span className="dp-spec-lbl">Surface</span>
+                <div className="dp__spec">
+                  <Maximize2 size={18} style={{ color: "var(--gold)" }} />
+                  <span className="dp__spec-val">{formatSurface(listing.surface)}</span>
+                  <span className="dp__spec-lbl">Surface</span>
                 </div>
               )}
               {listing.rooms && (
-                <div className="dp-spec">
-                  <Layers size={20} />
-                  <span className="dp-spec-val">{listing.rooms}</span>
-                  <span className="dp-spec-lbl">Pièces</span>
+                <div className="dp__spec">
+                  <Layers size={18} style={{ color: "var(--gold)" }} />
+                  <span className="dp__spec-val">{listing.rooms}</span>
+                  <span className="dp__spec-lbl">Pièces</span>
                 </div>
               )}
               {listing.bedrooms && (
-                <div className="dp-spec">
-                  <Bed size={20} />
-                  <span className="dp-spec-val">{listing.bedrooms}</span>
-                  <span className="dp-spec-lbl">Chambres</span>
+                <div className="dp__spec">
+                  <Bed size={18} style={{ color: "var(--gold)" }} />
+                  <span className="dp__spec-val">{listing.bedrooms}</span>
+                  <span className="dp__spec-lbl">Chambres</span>
                 </div>
               )}
               {listing.bathrooms && (
-                <div className="dp-spec">
-                  <Bath size={20} />
-                  <span className="dp-spec-val">{listing.bathrooms}</span>
-                  <span className="dp-spec-lbl">Sdb</span>
+                <div className="dp__spec">
+                  <Bath size={18} style={{ color: "var(--gold)" }} />
+                  <span className="dp__spec-val">{listing.bathrooms}</span>
+                  <span className="dp__spec-lbl">Sdb.</span>
                 </div>
               )}
               {listing.floor !== null && (
-                <div className="dp-spec">
-                  <span className="dp-spec-emoji">🏢</span>
-                  <span className="dp-spec-val">{formatFloor(listing.floor)}</span>
-                  <span className="dp-spec-lbl">Étage</span>
+                <div className="dp__spec">
+                  <span style={{ fontSize: 18, color: "var(--gold)" }}>⬡</span>
+                  <span className="dp__spec-val">{formatFloor(listing.floor)}</span>
+                  <span className="dp__spec-lbl">Étage</span>
                 </div>
               )}
             </div>
 
             {/* Description */}
             {listing.description && (
-              <div className="dp-section">
-                <h2 className="dp-section-title">Description</h2>
-                <p className="dp-description">{listing.description}</p>
+              <div className="dp__section reveal">
+                <span className="eyebrow">Description</span>
+                <p className="dp__description">{listing.description}</p>
               </div>
             )}
 
             {/* Amenities */}
             {amenities.length > 0 && (
-              <div className="dp-section">
-                <h2 className="dp-section-title">Équipements & Commodités</h2>
-                <div className="dp-amenities">
+              <div className="dp__section reveal reveal-delay-1">
+                <span className="eyebrow">Équipements</span>
+                <div className="dp__amenities">
                   {amenities.map(({ key, label }) => (
-                    <span key={key} className="dp-amenity">{label}</span>
+                    <span key={key} className="dp__amenity">{label}</span>
                   ))}
                 </div>
               </div>
@@ -156,150 +168,166 @@ export default async function ListingDetailPage({ params }: Props) {
           </div>
 
           {/* Right — sticky contact */}
-          <aside className="dp-aside">
+          <aside className="dp__aside">
             <ContactForm listing={listing} />
           </aside>
         </div>
 
-        {/* ── Related listings ─── */}
+        {/* ── Related ── */}
         {(related.data?.length ?? 0) > 0 && (
-          <div className="dp-related">
+          <section className="dp__related">
             <div className="container">
-              <h2 className="dp-related-title">Biens similaires</h2>
-              <div className="dp-related-grid stagger">
+              <span className="eyebrow">Similaires</span>
+              <h2 className="dp__related-title">Vous aimerez aussi</h2>
+              <div className="dp__related-grid">
                 {related.data!.map((l, i) => (
-                  <div key={l.id} className="anim-fade-up">
-                    <ListingCard listing={l} priority={false} />
+                  <div key={l.id} className="reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
+                    <ListingCard listing={l} />
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </section>
         )}
       </div>
 
       <style>{`
-        .dp-root { padding-bottom: 0; }
-
-        .dp-breadcrumb {
-          background: var(--charcoal);
-          padding: 80px 0 0;
+        .dp__breadcrumb {
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          padding: 16px 0;
         }
-        .dp-breadcrumb-inner {
+        .dp__breadcrumb-inner {
           display: flex; align-items: center; gap: 10px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        .dp-back {
+        .dp__back {
           display: flex; align-items: center; gap: 6px;
-          font-size: 13px; color: var(--terra-light);
+          font-size: 12px; color: var(--gold);
+          letter-spacing: 0.06em; text-transform: uppercase;
           text-decoration: none; transition: gap 0.2s ease;
         }
-        .dp-back:hover { gap: 10px; }
-        .dp-bc-sep     { color: rgba(255,255,255,0.2); }
-        .dp-bc-current { font-size: 13px; color: rgba(255,255,255,0.4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+        .dp__back:hover { gap: 10px; }
+        .dp__bc-sep { color: var(--border-hover); }
+        .dp__bc-cur { font-size: 12px; color: var(--muted); }
 
-        /* Gallery is full-width */
-
-        .dp-body {
+        .dp__body {
           display: grid;
-          grid-template-columns: 1fr 380px;
-          gap: 48px;
-          padding-top: 48px; padding-bottom: 80px;
+          grid-template-columns: 1fr 400px;
+          gap: 60px; padding-top: 56px; padding-bottom: 80px;
           align-items: start;
         }
-        @media (max-width: 1024px) {
-          .dp-body { grid-template-columns: 1fr; }
-          .dp-aside { order: -1; }
+        @media (max-width: 1100px) {
+          .dp__body { grid-template-columns: 1fr; }
+          .dp__aside { order: -1; }
         }
 
-        .dp-header { margin-bottom: 32px; }
-        .dp-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-
-        .dp-purpose-badge, .dp-type-badge, .dp-status-badge {
-          font-size: 11px; font-weight: 600; padding: 4px 12px;
-          border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em;
+        /* Header */
+        .dp__header { margin-bottom: 40px; }
+        .dp__badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .dp__purpose-badge, .dp__type-badge {
+          font-size: 10px; font-weight: 600; padding: 5px 12px;
+          border-radius: 2px; text-transform: uppercase; letter-spacing: 0.1em;
         }
-        .dp-purpose-badge {
-          background: rgba(196,113,79,0.1); color: var(--terracotta);
+        .dp__purpose-badge {
+          background: rgba(184,151,90,0.12); color: var(--gold);
+          border: 1px solid rgba(184,151,90,0.25);
         }
-        .dp-type-badge {
-          background: var(--cream-dark); color: var(--muted);
-        }
-
-        .dp-title {
-          font-family: var(--font-display);
-          font-size: clamp(28px, 4vw, 42px);
-          font-weight: 600; color: var(--charcoal);
-          line-height: 1.15; margin-bottom: 12px;
-        }
-        .dp-location {
-          display: flex; align-items: center; gap: 6px;
-          font-size: 15px; color: var(--muted); margin-bottom: 16px;
-        }
-        .dp-price {
-          font-family: var(--font-display);
-          font-size: clamp(28px, 3vw, 38px);
-          font-weight: 600; color: var(--terracotta);
-        }
-
-        .dp-specs {
-          display: flex; flex-wrap: wrap; gap: 0;
-          border: 1px solid var(--border); border-radius: var(--radius-lg);
-          overflow: hidden; margin-bottom: 40px;
-        }
-        .dp-spec {
-          flex: 1; min-width: 100px;
-          display: flex; flex-direction: column; align-items: center;
-          gap: 6px; padding: 20px 16px;
-          border-right: 1px solid var(--border);
-          background: var(--white);
-          color: var(--muted);
-        }
-        .dp-spec:last-child { border-right: none; }
-        .dp-spec-emoji { font-size: 20px; }
-        .dp-spec-val {
-          font-family: var(--font-display);
-          font-size: 20px; font-weight: 600; color: var(--charcoal);
-          text-align: center;
-        }
-        .dp-spec-lbl { font-size: 11px; color: var(--muted); text-align: center; }
-
-        .dp-section { margin-bottom: 36px; }
-        .dp-section-title {
-          font-family: var(--font-display);
-          font-size: 22px; font-weight: 600; color: var(--charcoal);
-          margin-bottom: 16px; padding-bottom: 12px;
-          border-bottom: 1px solid var(--border);
-        }
-        .dp-description {
-          font-size: 15px; color: var(--ink);
-          line-height: 1.8; white-space: pre-wrap;
-        }
-
-        .dp-amenities { display: flex; flex-wrap: wrap; gap: 8px; }
-        .dp-amenity {
-          padding: 7px 16px; border-radius: 20px;
-          background: var(--cream-dark); color: var(--ink);
-          font-size: 13px; font-weight: 450;
+        .dp__type-badge {
+          background: var(--surface-3); color: var(--muted-2);
           border: 1px solid var(--border);
         }
 
-        .dp-aside { position: sticky; top: 90px; }
+        .dp__title {
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 400; color: var(--white);
+          line-height: 1.15; margin-bottom: 14px;
+        }
+        .dp__location {
+          display: flex; align-items: center; gap: 6px;
+          font-size: 14px; color: var(--muted-2); margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+        .dp__address { color: var(--muted); }
 
-        .dp-related {
-          background: var(--cream-dark);
-          padding: 64px 0;
+        .dp__price-row {
+          display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
         }
-        .dp-related-title {
+        .dp__price {
           font-family: var(--font-display);
-          font-size: 32px; font-weight: 600; color: var(--charcoal);
-          margin-bottom: 32px;
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 500; color: var(--gold);
         }
-        .dp-related-grid {
+        .dp__wa-quick {
+          display: flex; align-items: center; gap: 8px;
+          padding: 10px 20px; border-radius: 2px;
+          background: rgba(37,211,102,0.1);
+          border: 1px solid rgba(37,211,102,0.2);
+          color: #4cd880; font-size: 13px; font-weight: 500;
+          text-decoration: none; transition: all 0.2s ease;
+        }
+        .dp__wa-quick:hover { background: rgba(37,211,102,0.18); }
+
+        /* Specs */
+        .dp__specs {
+          display: flex; flex-wrap: wrap; gap: 0;
+          border: 1px solid var(--border);
+          border-radius: var(--r-md); overflow: hidden;
+          margin-bottom: 48px; background: var(--surface-2);
+        }
+        .dp__spec {
+          flex: 1; min-width: 100px;
+          display: flex; flex-direction: column;
+          align-items: center; gap: 6px;
+          padding: 24px 16px;
+          border-right: 1px solid var(--border);
+          transition: background 0.2s ease;
+        }
+        .dp__spec:last-child { border-right: none; }
+        .dp__spec:hover { background: var(--surface-3); }
+        .dp__spec-val {
+          font-family: var(--font-display);
+          font-size: 22px; font-weight: 500; color: var(--white);
+          text-align: center;
+        }
+        .dp__spec-lbl {
+          font-size: 11px; color: var(--muted);
+          letter-spacing: 0.06em; text-align: center;
+          text-transform: uppercase;
+        }
+
+        /* Sections */
+        .dp__section { margin-bottom: 48px; }
+        .dp__description {
+          font-size: 16px; color: var(--muted-2);
+          line-height: 1.85; white-space: pre-wrap;
+          margin-top: 8px;
+        }
+        .dp__amenities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .dp__amenity {
+          padding: 8px 16px; border-radius: 2px;
+          background: var(--surface-3);
+          border: 1px solid var(--border);
+          font-size: 13px; color: var(--muted-2);
+          transition: all 0.2s ease;
+        }
+        .dp__amenity:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* Aside */
+        .dp__aside { position: sticky; top: 90px; }
+
+        /* Related */
+        .dp__related {
+          padding: 80px 0; border-top: 1px solid var(--border);
+          background: var(--surface);
+        }
+        .dp__related-title {
+          font-size: clamp(28px, 4vw, 40px); font-weight: 400;
+          margin: 8px 0 40px;
+        }
+        .dp__related-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 24px;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 20px;
         }
       `}</style>
     </>
