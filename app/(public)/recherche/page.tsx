@@ -1,12 +1,16 @@
 import { getListings } from "@/lib/supabase/queries";
 import type { ListingFiltersWithPagination, ListingPurpose, PropertyType } from "@/types";
 import ListingCard from "@/components/listings/ListingCard";
-import Pagination from "@/components/listings/Pagination";
+
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { CITY_NAMES } from "@/constants/cities";
 import { TYPE_OPTIONS, PURPOSE_OPTIONS, SORT_OPTIONS } from "@/constants/filters";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import Pagination from "@/components/listings/PaginationWrapper";
+
+
 export const metadata = {
   title: "Recherche — Tous les biens",
   description: "Recherchez parmi tous nos biens immobiliers : appartements, villas, maisons à vendre, louer ou en vacances.",
@@ -192,14 +196,14 @@ export default async function RecherchePage({ searchParams }: Props) {
               ))}
             </div>
 
-            <Suspense fallback={null}>
+            
               <Pagination
                 currentPage={page}
                 totalPages={totalPages}
                 total={total}
                 limit={limit}
               />
-            </Suspense>
+            
           </>
         )}
       </div>

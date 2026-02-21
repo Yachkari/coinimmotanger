@@ -24,7 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <ScrollRevealInit />
+        <Suspense fallback={null}>
+    <ScrollRevealInit />
+  </Suspense>
         <Suspense fallback={null}>
           {children}
         </Suspense>

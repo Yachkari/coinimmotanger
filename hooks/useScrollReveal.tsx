@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function ScrollRevealInit() {
-  const pathname    = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,7 +27,7 @@ export default function ScrollRevealInit() {
     }, 80);
 
     return () => clearTimeout(timer);
-  }, [pathname, searchParams]); // ← searchParams triggers re-observe on page change
+  }, [pathname]);
 
   return null;
 }
