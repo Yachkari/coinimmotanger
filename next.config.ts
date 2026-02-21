@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "oxitpudbathsmyynvnpw.supabase.co",   // ← replace this
+        // hostname: "uxgxddoueavblblnkekn.supabase.co",   // hostname migration
         pathname: "/storage/v1/object/public/**",
       },
     ],
