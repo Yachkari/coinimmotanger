@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { CITY_NAMES } from "@/constants/cities";
 import { TYPE_OPTIONS, PURPOSE_OPTIONS, SORT_OPTIONS } from "@/constants/filters";
-
+import { Suspense } from "react";
 export const metadata = {
   title: "Recherche — Tous les biens",
   description: "Recherchez parmi tous nos biens immobiliers : appartements, villas, maisons à vendre, louer ou en vacances.",
@@ -192,12 +192,14 @@ export default async function RecherchePage({ searchParams }: Props) {
               ))}
             </div>
 
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              total={total}
-              limit={limit}
-            />
+            <Suspense fallback={null}>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                total={total}
+                limit={limit}
+              />
+            </Suspense>
           </>
         )}
       </div>

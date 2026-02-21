@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getHomeMetadata, getOrganizationStructuredData } from "@/lib/seo";
 import ScrollRevealInit from "@/hooks/useScrollReveal";
 import "./globals.css";
+import { Suspense } from "react";
 
 export const metadata: Metadata = getHomeMetadata();
 
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ScrollRevealInit />
-        {children}
+        <Suspense fallback={null}>
+          {children}
+        </Suspense>
       </body>
     </html>
   );

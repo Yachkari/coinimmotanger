@@ -1,4 +1,5 @@
 import ContactFormStandalone from "@/components/contact/ContactFormStandalone";
+import { Suspense } from "react";
 import OfficeMap from "@/components/contact/OfficeMap";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
@@ -36,9 +37,11 @@ export default function ContactPage() {
       <div className="container cp__body">
 
         {/* Left — form */}
-        <div className="reveal">
-          <ContactFormStandalone />
-        </div>
+        <Suspense fallback={null}>
+          <div className="reveal">
+            <ContactFormStandalone />
+          </div>
+        </Suspense>
 
         {/* Right — info cards + socials + map */}
         <div className="cp__info">

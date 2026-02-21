@@ -1,4 +1,5 @@
 import ListingForm from "@/components/admin/ListingForm";
+import { Suspense } from "react";
 
 export const metadata = { title: "Nouvelle annonce" };
 
@@ -10,7 +11,9 @@ export default function NewListingPage() {
         <p className="page-sub">Remplissez les informations puis ajoutez les photos</p>
       </div>
 
-      <ListingForm />
+       <Suspense fallback={null}>
+        <ListingForm />
+      </Suspense>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap');
