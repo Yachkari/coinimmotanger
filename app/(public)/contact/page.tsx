@@ -1,8 +1,10 @@
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
-
-import ContactFormStandalone from "@/components/contact/ContactFormWrapper";
-import OfficeMap from "@/components/contact/OfficeMapWrapper"
+import ContactFormStandalone from "@/components/contact/ContactFormStandalone";
+// import ContactFormStandalone from "@/components/contact/ContactFormWrapper";
+// import OfficeMap from "@/components/contact/OfficeMapWrapper"
+import OfficeMap from "@/components/contact/OfficeMap";
+import { Suspense } from "react";
 
 
 
@@ -44,7 +46,10 @@ export default function ContactPage() {
         
         
           <div className="reveal">
-            <ContactFormStandalone />
+            <Suspense fallback={null}>
+               <ContactFormStandalone />
+            </Suspense>
+           
           </div>
         
         
@@ -141,7 +146,10 @@ export default function ContactPage() {
 
           {/* Map — flush to bottom of column */}
           <div className="reveal reveal-delay-3">
-            <OfficeMap lat={lat} lng={lng} address={address} />
+            <Suspense fallback={null}>
+              <OfficeMap lat={lat} lng={lng} address={address} />
+            </Suspense>
+            
           </div>
 
         </div>

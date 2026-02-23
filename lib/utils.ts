@@ -19,15 +19,14 @@ export function formatPrice(
   price: number,
   period?: string | null
 ): string {
-  const formatted = new Intl.NumberFormat("fr-MA", {
-    style: "decimal",
-    maximumFractionDigits: 0,
-  }).format(price);
+  // Manual formatting — consistent on server and client
+  const formatted = Math.round(price)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
   const base = `${formatted} MAD`;
   return period ? `${base} / ${period}` : base;
 }
-
 
 // ── Surface formatting ───────────────────────────────────────
 // formatSurface(110) → "110 m²"

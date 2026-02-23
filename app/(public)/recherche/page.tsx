@@ -7,9 +7,10 @@ import { Search } from "lucide-react";
 import { CITY_NAMES } from "@/constants/cities";
 import { TYPE_OPTIONS, PURPOSE_OPTIONS, SORT_OPTIONS } from "@/constants/filters";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import Pagination from "@/components/listings/PaginationWrapper";
-
+// import dynamic from "next/dynamic";
+// import Pagination from "@/components/listings/PaginationWrapper";
+import Pagination from "@/components/listings/Pagination";
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Recherche — Tous les biens",
@@ -196,14 +197,14 @@ export default async function RecherchePage({ searchParams }: Props) {
               ))}
             </div>
 
-            
+            <Suspense fallback={null}>
               <Pagination
                 currentPage={page}
                 totalPages={totalPages}
                 total={total}
                 limit={limit}
               />
-            
+            </Suspense>
           </>
         )}
       </div>

@@ -7,24 +7,35 @@ export default function ScrollRevealInit() {
   const pathname = usePathname();
 
   useEffect(() => {
+    const elements = Array.from(document.querySelectorAll(".reveal"));
+
+    elements.forEach(el => {
+      const computed = getComputedStyle(el);
+      const delay = computed.transitionDelay || "0s";
+
+      (el as HTMLElement).style.opacity = "0";
+      (el as HTMLElement).style.transform = "translateY(40px)";
+      (el as HTMLElement).style.transition = `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${delay}`;
+    });
+
     const timer = setTimeout(() => {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              entry.target.classList.add("revealed");
-              observer.unobserve(entry.target);
+              const el = entry.target as HTMLElement;
+              el.style.opacity = "1";
+              el.style.transform = "translateY(0)";
+              observer.unobserve(el);
             }
           });
         },
         { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
       );
 
-      const elements = document.querySelectorAll(".reveal:not(.revealed)");
-      elements.forEach((el) => observer.observe(el));
-
+      elements.forEach(el => observer.observe(el));
       return () => observer.disconnect();
-    }, 80);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [pathname]);
