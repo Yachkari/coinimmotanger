@@ -132,9 +132,9 @@ export default function ListingCard({ listing, priority = false, variant = "defa
         .lc:hover {
           transform: translateY(-4px);
           box-shadow: var(--shadow-card), var(--shadow-glow);
-          border-color: rgba(184,151,90,0.2);
+          border-color: var(--gold-glow);
         }
-        .lc:hover::after { border-color: rgba(184,151,90,0.15); }
+        .lc:hover::after { border-color: var(--gold-glow);  }
         .lc:hover .lc__img { transform: scale(1.05); }
         .lc:hover .lc__cta { color: var(--gold); letter-spacing: 0.12em; }
 
@@ -157,7 +157,7 @@ export default function ListingCard({ listing, priority = false, variant = "defa
         /* Overlay for sold items */
         .lc__sold-overlay {
           position: absolute; inset: 0;
-          background: rgba(8,8,8,0.6);
+          background: var(--overlay-dark);
           display: flex; align-items: center; justify-content: center;
           backdrop-filter: blur(2px);
         }
@@ -169,7 +169,7 @@ export default function ListingCard({ listing, priority = false, variant = "defa
         }
         .lc__purpose-badge {
           padding: 4px 10px; border-radius: 2px;
-          background: rgba(8,8,8,0.75);
+          background: var(--overlay-dark);
           backdrop-filter: blur(8px);
           font-size: 10px; font-weight: 600;
           letter-spacing: 0.1em; text-transform: uppercase;

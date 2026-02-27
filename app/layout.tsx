@@ -3,6 +3,8 @@ import { getHomeMetadata, getOrganizationStructuredData } from "@/lib/seo";
 import ScrollRevealInit from "@/hooks/useScrollReveal";
 import "./globals.css";
 import { Suspense } from "react";
+import ThemeProvider from "@/components/theme/ThemeProvider";
+
 
 export const metadata: Metadata = getHomeMetadata();
 
@@ -10,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const structuredData = getOrganizationStructuredData();
 
   return (
-    <html lang="fr">
+    <html lang="fr" data-theme="light">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -24,12 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <Suspense fallback={null}>
-    <ScrollRevealInit />
-  </Suspense>
-        <Suspense fallback={null}>
-          {children}
-        </Suspense>
+        <ThemeProvider>
+          <ScrollRevealInit />
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
+        </ThemeProvider>
+        
       </body>
     </html>
   );

@@ -8,6 +8,7 @@ import { AMENITIES } from "@/constants/amenities";
 import { TYPE_OPTIONS, PURPOSE_OPTIONS } from "@/constants/filters";
 import { buildListingSlug } from "@/lib/slugify";
 import ImageUploader from "@/components/admin/ImageUploader";
+import { REFERENCE_PREFIXES, GEO_CODES, GEO_CODE_KEYS } from "@/constants/referenceCodes";
 
 interface Props {
   listing?: Listing;
@@ -34,6 +35,9 @@ const EMPTY: Partial<CreateListingPayload> = {
   cover_image_index: 0,
   meta_title:        null,
   meta_description:  null,
+  reference_code: null,
+  reference:      null,
+  geo_code: null,
 };
 
 export default function ListingForm({ listing }: Props) {
@@ -100,6 +104,21 @@ export default function ListingForm({ listing }: Props) {
 
       // Strip relational/readonly fields before PUT
       const { listing_images, created_at, updated_at, ...cleanPayload } = payload as any;
+
+      // Generate reference on first create
+      if (!isUpdate && payload.reference_code && payload.geo_code && !payload.reference) {
+  const refRes = await fetch("/api/listings/reference", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      reference_code: payload.reference_code,
+      geo_code: payload.geo_code,
+    }),
+  });
+  const refData = await refRes.json();
+  payload.reference = refData.reference;
+  set("reference", refData.reference);
+}
 
       const res = await fetch(url, {
         method,
@@ -230,7 +249,52 @@ export default function ListingForm({ listing }: Props) {
             )}
           </div>
         </section>
+        {/* ── Référence ── */}
+        {/* ── Référence ── */}
+<section className="lf-section">
+  <h2 className="lf-section-title">Référence</h2>
+  <div className="lf-row">
+    <div className="lf-field">
+      <label className="lf-label">Catégorie *</label>
+      <select
+        className="lf-input"
+        value={form.reference_code ?? ""}
+        onChange={(e) => set("reference_code", e.target.value || null)}
+        disabled={listingExists}
+      >
+        <option value="">Choisir</option>
+        {REFERENCE_PREFIXES.map((code) => (
+          <option key={code} value={code}>{code}</option>
+        ))}
+      </select>
+    </div>
 
+    <div className="lf-field">
+      <label className="lf-label">Zone géographique *</label>
+      <select
+        className="lf-input"
+        value={form.geo_code ?? ""}
+        onChange={(e) => set("geo_code", e.target.value || null)}
+        disabled={listingExists}
+      >
+        <option value="">Choisir</option>
+        {GEO_CODE_KEYS.map((key) => (
+          <option key={key} value={key}>{key} — {GEO_CODES[key]}</option>
+        ))}
+      </select>
+    </div>
+
+    {form.reference && (
+      <div className="lf-field">
+        <label className="lf-label">Référence générée</label>
+        <div className="lf-input lf-reference-display">{form.reference}</div>
+      </div>
+    )}
+  </div>
+  {listingExists && (
+    <p className="lf-hint">La référence ne peut pas être modifiée après création.</p>
+  )}
+</section>
         {/* ── Caractéristiques ── */}
         <section className="lf-section">
           <h2 className="lf-section-title">Caractéristiques</h2>
@@ -364,84 +428,93 @@ export default function ListingForm({ listing }: Props) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;600&family=Playfair+Display:wght@600&display=swap');
 
-        .lf-root { font-family: 'DM Sans', sans-serif; max-width: 860px; }
-        .lf-form { display: flex; flex-direction: column; gap: 8px; }
+.lf-root { font-family: 'DM Sans', sans-serif; max-width: 860px; }
+.lf-form { display: flex; flex-direction: column; gap: 8px; }
 
-        .lf-section {
-          background: #141414; border: 1px solid #1f1f1f;
-          border-radius: 12px; padding: 28px; margin-bottom: 16px;
-        }
-        .lf-section-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 17px; color: #d0d0d0; margin-bottom: 20px;
-          padding-bottom: 12px; border-bottom: 1px solid #1f1f1f;
-        }
-        .optional { font-family: 'DM Sans', sans-serif; font-size: 12px; color: #555; font-weight: 400; }
-        .lf-hint  { font-size: 12px; color: #555; margin-top: -12px; margin-bottom: 16px; }
+.lf-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px; margin-bottom: 16px;
+}
+.lf-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; color: var(--off-white); margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.optional { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); font-weight: 400; }
+.lf-hint  { font-size: 12px; color: var(--muted); margin-top: -12px; margin-bottom: 16px; }
 
-        .lf-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
-        .lf-row-5 { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+.lf-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.lf-row-5 { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 
-        .lf-field { display: flex; flex-direction: column; gap: 7px; }
-        .lf-field.full { grid-column: 1 / -1; margin-bottom: 16px; }
+.lf-field { display: flex; flex-direction: column; gap: 7px; }
+.lf-field.full { grid-column: 1 / -1; margin-bottom: 16px; }
 
-        .lf-label { font-size: 11px; font-weight: 600; color: #777; text-transform: uppercase; letter-spacing: 0.06em; }
+.lf-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
-        .lf-input {
-          background: #0f0f0f; border: 1px solid #2a2a2a;
-          border-radius: 8px; padding: 11px 13px;
-          font-size: 14px; color: #e0e0e0;
-          font-family: 'DM Sans', sans-serif;
-          outline: none; transition: border-color 0.15s ease; width: 100%;
-        }
-        .lf-input::placeholder { color: #333; }
-        .lf-input:focus { border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,0.07); }
-        .lf-input:disabled { opacity: 0.4; cursor: not-allowed; }
-        .lf-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+.lf-input {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 11px 13px;
+  font-size: 14px; color: var(--off-white);
+  font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.15s ease; width: 100%;
+}
+.lf-input::placeholder { color: var(--muted); }
+.lf-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.07); }
+.lf-input:disabled { opacity: 0.4; cursor: not-allowed; }
+.lf-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
 
-        .amenities-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .amenity-chip {
-          padding: 7px 14px; border-radius: 20px; font-size: 12px;
-          font-weight: 500; font-family: 'DM Sans', sans-serif;
-          cursor: pointer; transition: all 0.15s ease;
-          background: #0f0f0f; border: 1px solid #2a2a2a; color: #777;
-        }
-        .amenity-chip:hover  { border-color: #c9a84c; color: #c9a84c; }
-        .amenity-chip.active { background: rgba(201,168,76,0.12); border-color: #c9a84c; color: #c9a84c; }
+.amenities-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.amenity-chip {
+  padding: 7px 14px; border-radius: 20px; font-size: 12px;
+  font-weight: 500; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.15s ease;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--muted);
+}
+.amenity-chip:hover  { border-color: var(--gold); color: var(--gold); }
+.amenity-chip.active { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
 
-        .lf-toggle { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .lf-toggle input { display: none; }
-        .toggle-track {
-          width: 40px; height: 22px; border-radius: 11px;
-          background: #2a2a2a; position: relative; flex-shrink: 0;
-          transition: background 0.2s ease;
-        }
-        .toggle-track::after {
-          content: ''; position: absolute; top: 3px; left: 3px;
-          width: 16px; height: 16px; border-radius: 50%;
-          background: #555; transition: all 0.2s ease;
-        }
-        .lf-toggle input:checked ~ .toggle-track { background: #c9a84c; }
-        .lf-toggle input:checked ~ .toggle-track::after { transform: translateX(18px); background: #0a0a0a; }
-        .toggle-label { font-size: 14px; color: #c0c0c0; }
+.lf-toggle { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.lf-toggle input { display: none; }
+.toggle-track {
+  width: 40px; height: 22px; border-radius: 11px;
+  background: var(--border); position: relative; flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.toggle-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--muted); transition: all 0.2s ease;
+}
+.lf-toggle input:checked ~ .toggle-track { background: var(--gold); }
+.lf-toggle input:checked ~ .toggle-track::after { transform: translateX(18px); background: var(--black); }
+.toggle-label { font-size: 14px; color: var(--off-white); }
 
-        .lf-error   { background: rgba(224,82,82,0.1); border: 1px solid rgba(224,82,82,0.25); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #e05252; }
-        .lf-success { background: rgba(76,175,130,0.1); border: 1px solid rgba(76,175,130,0.25); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #4caf82; }
+.lf-error   { background: rgba(224,82,82,0.1); border: 1px solid rgba(224,82,82,0.25); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #e05252; }
+.lf-success { background: rgba(76,175,130,0.1); border: 1px solid rgba(76,175,130,0.25); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #4caf82; }
 
-        .lf-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
-        .btn-ghost {
-          background: none; border: 1px solid #2a2a2a; color: #888;
-          padding: 11px 20px; border-radius: 8px; font-size: 14px;
-          cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s ease;
-        }
-        .btn-ghost:hover { border-color: #444; color: #c0c0c0; }
-        .btn-gold {
-          background: #c9a84c; color: #0a0a0a; border: none;
-          padding: 11px 24px; border-radius: 8px; font-size: 14px;
-          font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s ease;
-        }
-        .btn-gold:hover:not(:disabled) { background: #d4b45a; transform: translateY(-1px); }
-        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+.lf-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+.btn-ghost {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 11px 20px; border-radius: 8px; font-size: 14px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s ease;
+}
+.btn-ghost:hover { border-color: var(--muted); color: var(--off-white); }
+.btn-gold {
+  background: var(--gold); color: var(--black); border: none;
+  padding: 11px 24px; border-radius: 8px; font-size: 14px;
+  font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s ease;
+}
+.btn-gold:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-1px); }
+.btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+.lf-reference-display {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  cursor: default;
+  user-select: all;
+}
+
       `}</style>
     </div>
   );

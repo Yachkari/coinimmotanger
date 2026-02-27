@@ -74,10 +74,14 @@ export default async function ListingDetailPage({ params }: Props) {
               <div className="dp__badges">
                 <span className="dp__purpose-badge">{formatPurpose(listing.purpose)}</span>
                 <span className="dp__type-badge">{formatType(listing.type)}</span>
+                {listing.reference && (
+    <span className="dp__ref-badge">{listing.reference}</span>
+  )}
                 {listing.status !== "disponible" && (
                   <span className={`badge ${STATUS_MAP[listing.status] ?? ""}`}>
                     {listing.status}
                   </span>
+                  
                 )}
               </div>
 
@@ -329,6 +333,14 @@ export default async function ListingDetailPage({ params }: Props) {
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: 20px;
         }
+         .dp__ref-badge {
+        font-size: 10px; font-weight: 700; padding: 5px 12px;
+        border-radius: 2px; text-transform: uppercase; letter-spacing: 0.1em;
+        background: rgba(201,168,76,0.08);
+        color: var(--gold);
+        border: 1px solid rgba(201,168,76,0.2);
+        font-family: var(--font-ui);
+      }
       `}</style>
     </>
   );

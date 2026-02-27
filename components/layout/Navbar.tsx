@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
 import Image from "next/image";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const NAV = [
   { href: "/vente",    label: "Acheter"  },
@@ -46,13 +47,21 @@ export default function Navbar() {
           </Link> */}
           <Link href="/" className="nav__logo" onClick={() => setOpen(false)}>
             <Image
-              src="/logo.png"
-              alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
-              width={180}
-              height={180}
-              className="nav__logo-img"
-              priority
-            />
+    src="/logo.png"
+    alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
+    width={180}
+    height={180}
+    className="nav__logo-img nav__logo-img--dark"
+    priority
+  />
+            <Image
+    src="/logo-black.png"
+    alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
+    width={180}
+    height={180}
+    className="nav__logo-img nav__logo-img--light"
+    priority
+  />
           </Link>
 
           {/* Center nav */}
@@ -74,6 +83,7 @@ export default function Navbar() {
               <Search size={15} />
               <span>Rechercher</span>
             </Link>
+            <ThemeToggle />
             <button
               className="nav__burger"
               onClick={() => setOpen(!open)}
@@ -114,6 +124,7 @@ export default function Navbar() {
           <p>{process.env.NEXT_PUBLIC_SITE_NAME} · Immobilier au Maroc</p>
         </div>
       </div>
+      
 
       <style>{`
         .nav {
@@ -123,11 +134,11 @@ export default function Navbar() {
           border-bottom: 1px solid transparent;
         }
         .nav--scrolled {
-          background: rgba(8,8,8,0.88);
-          backdrop-filter: blur(20px) saturate(1.4);
-          -webkit-backdrop-filter: blur(20px) saturate(1.4);
-          border-bottom-color: var(--border);
-        }
+  background: var(--nav-bg-scrolled);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom-color: var(--border);
+}
         .nav--open { background: var(--black) !important; border-bottom-color: var(--border) !important; }
 
         .nav__inner {

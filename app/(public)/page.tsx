@@ -196,24 +196,24 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          CITIES SECTION
+          PROPERTY TYPES SECTION
       ══════════════════════════════════════════════ */}
       <section className="cities">
         <div className="container">
           <div className="reveal">
-            <span className="eyebrow">Destinations</span>
-            <h2 className="cities__title">Nos villes</h2>
+            <span className="eyebrow">Nos biens</span>
+            <h2 className="cities__title">Par type de bien</h2>
           </div>
           <div className="cities__grid">
             {[
-              { name: "Tanger",      img: "https://plus.unsplash.com/premium_photo-1729930629518-79331f74a68c?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-              { name: "Tétouan",     img: "https://images.unsplash.com/photo-1636951094846-c96b66ac78f5?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-              { name: "M'diq",       img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" },
-              { name: "Al Hoceima",  img: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&q=80" },
-            ].map(({ name, img }, i) => (
+              { name: "Appartements", type: "appartement", img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80" },
+              { name: "Villas",       type: "villa",       img: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80" },
+              { name: "Riads",        type: "Ryad",        img: "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80" },
+              { name: "Maisons",      type: "maison",      img: "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=600&q=80" },
+            ].map(({ name, type, img }, i) => (
               <Link
                 key={name}
-                href={`/vente?city=${encodeURIComponent(name)}`}
+                href={`/vente?type=${encodeURIComponent(type)}`}
                 className="city-card reveal"
                 style={{ transitionDelay: `${i * 0.1}s` }}
               >
@@ -253,13 +253,13 @@ export default async function HomePage() {
         }
         .hero__overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(
-            to bottom,
-            rgba(8,8,8,0.55) 0%,
-            rgba(8,8,8,0.3)  40%,
-            rgba(8,8,8,0.5)  70%,
-            rgba(8,8,8,0.92) 100%
-          );
+           background: linear-gradient(
+    to bottom,
+    var(--hero-overlay-top) 0%,
+    var(--hero-overlay-mid) 40%,
+    var(--hero-overlay-top) 70%,
+    var(--hero-overlay-bot) 100%
+  );
         }
 
         /* Floating stats pill */
@@ -267,7 +267,7 @@ export default async function HomePage() {
           position: absolute; top: calc(var(--nav-h) + 24px); right: 40px;
           z-index: 2;
           display: flex; align-items: center; gap: 8px;
-          background: rgba(255,255,255,0.06);
+          background: var(--hero-pill-bg);
           backdrop-filter: blur(12px);
           border: 1px solid var(--border-hover);
           padding: 8px 16px; border-radius: 30px;
@@ -305,11 +305,11 @@ export default async function HomePage() {
         .hero__title-line:nth-child(1) { animation-delay: 0.3s; }
         .hero__title-line:nth-child(2) { animation-delay: 0.45s; }
         .hero__title-italic {
-          font-style: italic; color: var(--gold);
+          font-style: italic; color: #b8975a !important;
         }
 
         .hero__sub {
-          font-size: 16px; color: rgba(255,255,255,0.6);
+          font-size: 16px; color: var(--hero-sub-color);
           line-height: 1.7; max-width: 480px;
           margin-bottom: 36px;
           animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s both;
@@ -340,11 +340,11 @@ export default async function HomePage() {
 
         /* Bottom category bar */
         .hero__categories {
-          position: relative; z-index: 2;
-          border-top: 1px solid var(--border);
-          background: rgba(8,8,8,0.6);
-          backdrop-filter: blur(20px);
-        }
+  position: relative; z-index: 2;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(8,8,8,0.6);
+  backdrop-filter: blur(20px);
+}
         .hero__categories-inner {
           display: grid; grid-template-columns: repeat(3, 1fr);
         }
@@ -358,7 +358,7 @@ export default async function HomePage() {
           animation: fadeUp 0.6s ease 1s both;
         }
         .hero__cat:last-child { border-right: none; }
-        .hero__cat:hover { background: rgba(255,255,255,0.03); }
+        .hero__cat:hover { background: var(--hero-cat-hover); }
         .hero__cat:hover .hero__cat-arrow { color: var(--gold); transform: translate(2px,-2px); }
         .hero__cat-label {
           display: block; font-size: 16px; font-family: var(--font-display);
@@ -451,7 +451,7 @@ export default async function HomePage() {
         .fullbleed:hover .fullbleed__bg { transform: scale(1.0); }
         .fullbleed__overlay {
           position: absolute; inset: 0;
-          background: rgba(8,8,8,0.72);
+          background: var(--fullbleed-overlay);
         }
         .fullbleed__content {
           position: relative; z-index: 1;
@@ -495,11 +495,11 @@ export default async function HomePage() {
         .city-card:hover .city-card__img { transform: scale(1.06); }
         .city-card__overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.1) 60%);
+          background: linear-gradient(to top, var(--city-overlay-bot) 0%, var(--city-overlay-top) 60%);
           transition: background 0.3s ease;
         }
         .city-card:hover .city-card__overlay {
-          background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.2) 60%);
+          background: linear-gradient(to top, var(--city-overlay-bot-h) 0%, var(--city-overlay-top-h) 60%);
         }
         .city-card__content {
           position: absolute; bottom: 0; left: 0; right: 0;

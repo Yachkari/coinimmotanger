@@ -191,26 +191,26 @@ export default function ListingGallery({ images, title }: Props) {
         .gallery__cover-overlay {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
-          background: rgba(8,8,8,0);
+          background: transparent;
           color: white; opacity: 0;
           transition: all 0.25s ease;
         }
         .gallery__cover:hover .gallery__cover-overlay {
-          background: rgba(8,8,8,0.25); opacity: 1;
+          background: var(--gallery-hover); opacity: 1;
         }
 
         .gallery__thumb-overlay {
           position: absolute; inset: 0;
-          background: rgba(8,8,8,0);
+          background: transparent;
           transition: background 0.2s ease;
         }
         .gallery__thumb:hover .gallery__thumb-overlay {
-          background: rgba(8,8,8,0.2);
+          background: var(--gallery-thumb-h);
         }
 
         .gallery__more-overlay {
           position: absolute; inset: 0; z-index: 1;
-          background: rgba(8,8,8,0.65);
+          background: var(--gallery-more);
           display: flex; align-items: center; justify-content: center;
           color: white; font-size: 20px; font-weight: 600;
           font-family: var(--font-display);
@@ -219,7 +219,7 @@ export default function ListingGallery({ images, title }: Props) {
         .gallery__all-btn {
           position: absolute; bottom: 20px; right: 20px;
           display: flex; align-items: center; gap: 8px;
-          background: rgba(8,8,8,0.75); backdrop-filter: blur(12px);
+          background: var(--gallery-btn-bg); backdrop-filter: blur(12px);
           border: 1px solid var(--border-hover);
           color: var(--white); padding: 8px 16px; border-radius: 2px;
           font-size: 12px; font-weight: 500; cursor: pointer;
@@ -242,7 +242,7 @@ export default function ListingGallery({ images, title }: Props) {
         /* ── Lightbox ─────────────────────────────── */
         .lb {
           position: fixed; inset: 0; z-index: 600;
-          background: rgba(8,8,8,0.97);
+          background: var(--lb-bg);
           display: flex; align-items: center; justify-content: center;
           animation: fadeIn 0.2s ease;
           outline: none;
@@ -252,12 +252,12 @@ export default function ListingGallery({ images, title }: Props) {
         .lb__close {
           position: absolute; top: 24px; right: 24px;
           width: 44px; height: 44px; border-radius: 50%;
-          background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+          background: background: var(--lb-btn-bg); border: 1px solid var(--border);
           color: var(--white); cursor: pointer; z-index: 1;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s ease;
         }
-        .lb__close:hover { background: rgba(255,255,255,0.15); border-color: var(--gold); }
+        .lb__close:hover { background: var(--lb-btn-bg-h); border-color: var(--gold); }
 
         .lb__counter {
           position: absolute; top: 28px; left: 50%;
@@ -278,7 +278,7 @@ export default function ListingGallery({ images, title }: Props) {
         .lb__prev, .lb__next {
           position: absolute; top: 50%; transform: translateY(-50%);
           width: 52px; height: 52px; border-radius: 50%;
-          background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+          background: var(--lb-btn-bg); border: 1px solid var(--border);
           color: var(--white); cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s ease;

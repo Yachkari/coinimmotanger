@@ -12,7 +12,11 @@ export type PropertyType =
   | "maison"
   | "studio"
   | "bureau"
-  | "terrain";
+  | "terrain"
+   | "local industriel"
+  | "local commercial"
+  | "Ryad"
+  | "Ferme";
 
 export type ListingPurpose = "vente" | "location" | "vacances";
 
@@ -76,6 +80,11 @@ export interface Listing {
 
   // Joined relation — present when queried with images
   listing_images?: ListingImage[];
+
+  //reference
+  reference_code?: string | null;
+  reference?:      string | null;
+  geo_code?: string | null;
 }
 
 export interface ContactMessage {

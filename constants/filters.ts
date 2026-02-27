@@ -18,6 +18,10 @@ export const TYPE_OPTIONS: { value: PropertyType; label: string }[] = [
   { value: "studio",      label: "Studio"       },
   { value: "bureau",      label: "Bureau"       },
   { value: "terrain",     label: "Terrain"      },
+  { value: "local industriel",     label: "local industriel"      },
+  { value: "local commercial",     label: "local commercial"      },
+  { value: "Ryad",     label: "Ryad"      },
+  { value: "Ferme",     label: "Ferme"      },
 ];
 
 

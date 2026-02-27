@@ -108,27 +108,27 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
           border-radius: var(--r-lg); overflow: hidden;
           border: 1px solid var(--border);
         }
-        .map-canvas { width: 100%; height: 100%; background: #0e0e0e; }
+        .map-canvas { width: 100%; height: 100%; background: var(--surface); }
 
         .map-fade { position: absolute; z-index: 400; pointer-events: none; }
-        .map-fade--top    { top:0;left:0;right:0;height:40px;background:linear-gradient(to bottom,rgba(8,8,8,.55) 0%,transparent 100%); }
-        .map-fade--bottom { bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,rgba(8,8,8,.55) 0%,transparent 100%); }
-        .map-fade--left   { top:0;bottom:0;left:0;width:28px;background:linear-gradient(to right,rgba(8,8,8,.55) 0%,transparent 100%); }
-        .map-fade--right  { top:0;bottom:0;right:0;width:28px;background:linear-gradient(to left,rgba(8,8,8,.55) 0%,transparent 100%); }
+        .map-fade--top    { top:0;left:0;right:0;height:40px;background: linear-gradient(to bottom, var(--map-fade-color) 0%, transparent 100%); }
+        .map-fade--bottom { bottom:0;left:0;right:0;height:40px;background: linear-gradient(to top,   var(--map-fade-color) 0%, transparent 100%); }
+        .map-fade--left   { top:0;bottom:0;left:0;width:28px;background: linear-gradient(to right, var(--map-fade-color) 0%, transparent 100%); }
+        .map-fade--right  { top:0;bottom:0;right:0;width:28px; background: linear-gradient(to left,  var(--map-fade-color) 0%, transparent 100%); }
 
         .map-label {
           position:absolute;top:12px;left:12px;z-index:401;
           display:flex;align-items:center;gap:6px;
-          background:rgba(8,8,8,.8);backdrop-filter:blur(10px);
+          background: var(--map-bg);backdrop-filter:blur(10px);
           border:1px solid var(--border);border-radius:var(--r-sm);
           padding:5px 10px;font-size:10px;font-weight:600;
           color:var(--muted-2);letter-spacing:.08em;text-transform:uppercase;
         }
         .map-label svg { color:var(--gold); }
 
-        .leaflet-container { background:#0e0e0e !important; font-family:var(--font-ui) !important; }
+        .leaflet-container { background: var(--surface) !important; font-family:var(--font-ui) !important; }
         .leaflet-control-attribution {
-          background:rgba(8,8,8,.75)!important;color:rgba(255,255,255,.25)!important;font-size:9px!important;
+          background: var(--map-bg) !important;color:rgba(255,255,255,.25)!important;font-size:9px!important;
         }
         .leaflet-control-attribution a { color:rgba(255,255,255,.35)!important; }
         .leaflet-control-zoom {
@@ -136,7 +136,7 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
           overflow:hidden;margin-right:12px!important;margin-bottom:12px!important;
         }
         .leaflet-control-zoom a {
-          background:rgba(8,8,8,.85)!important;color:var(--muted-2)!important;
+           background: var(--map-zoom-bg) !important;color:var(--muted-2)!important;
           border-bottom:1px solid var(--border)!important;
           width:28px!important;height:28px!important;line-height:28px!important;
           transition:all .15s ease!important;
@@ -156,7 +156,7 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
         }
 
         .map-popup-wrap .leaflet-popup-content-wrapper {
-          background:rgba(14,14,14,.95)!important;backdrop-filter:blur(16px)!important;
+          background: var(--map-popup-bg) !important;backdrop-filter:blur(16px)!important;
           border:1px solid var(--border)!important;border-radius:var(--r-sm)!important;
           box-shadow:0 8px 32px rgba(0,0,0,.5)!important;padding:0!important;
         }

@@ -76,14 +76,18 @@ export function formatPurpose(purpose: ListingPurpose): string {
 
 export function formatType(type: PropertyType): string {
   const map: Record<PropertyType, string> = {
-    appartement: "Appartement",
-    villa: "Villa",
-    maison: "Maison",
-    studio: "Studio",
-    bureau: "Bureau",
-    terrain: "Terrain",
+    appartement:       "Appartement",
+    villa:             "Villa",
+    maison:            "Maison",
+    studio:            "Studio",
+    bureau:            "Bureau",
+    terrain:           "Terrain",
+    "local industriel": "Local Industriel",
+    "local commercial": "Local Commercial",
+    Ryad:              "Ryad",
+    Ferme:             "Ferme",
   };
-  return map[type];
+  return map[type] ?? type;
 }
 
 
