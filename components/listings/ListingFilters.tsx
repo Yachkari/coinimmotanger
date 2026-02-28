@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ListingPurpose } from "@/types";
-import { TYPE_OPTIONS, SORT_OPTIONS, BEDROOMS_OPTIONS } from "@/constants/filters";
+import { BEDROOMS_OPTIONS } from "@/constants/filters";
 import { CITY_NAMES } from "@/constants/cities";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useLanguage } from "@/components/language/LanguageProvider";
@@ -25,6 +25,25 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
   const { lang } = useLanguage();
+
+  // ── Language-aware options ───────────────────────────────
+  const TYPE_OPTIONS = [
+    { value: 'appartement', label: lang === 'fr' ? 'Appartement' : 'Apartment'  },
+    { value: 'villa',       label: lang === 'fr' ? 'Villa'       : 'Villa'       },
+    { value: 'maison',      label: lang === 'fr' ? 'Maison'      : 'House'       },
+    { value: 'Ryad',        label: lang === 'fr' ? 'Riad'        : 'Riad'        },
+    { value: 'bureau',      label: lang === 'fr' ? 'Bureau'      : 'Office'      },
+    { value: 'terrain',     label: lang === 'fr' ? 'Terrain'     : 'Land'        },
+    { value: 'commercial',  label: lang === 'fr' ? 'Commercial'  : 'Commercial'  },
+  ]
+
+  const SORT_OPTIONS = [
+    { value: 'date_desc',  label: lang === 'fr' ? 'Plus récents'     : 'Most recent'       },
+    { value: 'date_asc',   label: lang === 'fr' ? 'Plus anciens'     : 'Oldest first'      },
+    { value: 'price_asc',  label: lang === 'fr' ? 'Prix croissant'   : 'Price: low to high' },
+    { value: 'price_desc', label: lang === 'fr' ? 'Prix décroissant' : 'Price: high to low' },
+  ]
+  // ────────────────────────────────────────────────────────
 
   const [type,     setType]     = useState(currentFilters.type     ?? "");
   const [city,     setCity]     = useState(currentFilters.city     ?? "");
@@ -125,19 +144,17 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Price */}
       <div className="filter-group">
-        <span className="filter-label">
-          {lang === 'fr' ? 'Budget (MAD)' : 'Budget (MAD)'}
-        </span>
+        <span className="filter-label">Budget (MAD)</span>
         <div className="filter-range">
           <input
             type="number" className="filter-input"
-            placeholder={lang === 'fr' ? 'Min' : 'Min'}
+            placeholder="Min"
             value={minPrice} onChange={e => setMinPrice(e.target.value)} min={0}
           />
           <span className="filter-range-sep">—</span>
           <input
             type="number" className="filter-input"
-            placeholder={lang === 'fr' ? 'Max' : 'Max'}
+            placeholder="Max"
             value={maxPrice} onChange={e => setMaxPrice(e.target.value)} min={0}
           />
         </div>

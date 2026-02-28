@@ -744,3 +744,8 @@ button { font-family: var(--font-ui); cursor: pointer; }
 
 [data-theme="light"] .nav__logo-img--light { display: block; }
 [data-theme="light"] .nav__logo-img--dark  { display: none; }
+
+
+
+.nav{ z-index: 100 !important; }
+.mobile-menu { z-index: 99  !important; }

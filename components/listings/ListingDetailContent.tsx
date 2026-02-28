@@ -310,7 +310,8 @@ export default function ListingDetailContent({
         }
         .dp__amenity:hover { border-color: var(--gold); color: var(--gold); }
 
-        .dp__aside { position: sticky; top: 90px; }
+        // .dp__aside { position: sticky; top: 90px; }
+        .dp__aside { position: static; }
 
         .dp__related {
           padding: 80px 0; border-top: 1px solid var(--border);

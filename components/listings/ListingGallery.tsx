@@ -241,7 +241,7 @@ export default function ListingGallery({ images, title }: Props) {
 
         /* ── Lightbox ─────────────────────────────── */
         .lb {
-          position: fixed; inset: 0; z-index: 600;
+          position: fixed; inset: 0; z-index: 200;
           background: var(--lb-bg);
           display: flex; align-items: center; justify-content: center;
           animation: fadeIn 0.2s ease;
@@ -252,7 +252,7 @@ export default function ListingGallery({ images, title }: Props) {
         .lb__close {
           position: absolute; top: 24px; right: 24px;
           width: 44px; height: 44px; border-radius: 50%;
-          background: background: var(--lb-btn-bg); border: 1px solid var(--border);
+          background: var(--lb-btn-bg); border: 1px solid var(--border);
           color: var(--white); cursor: pointer; z-index: 1;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s ease;

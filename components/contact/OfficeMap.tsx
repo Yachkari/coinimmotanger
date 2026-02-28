@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 interface Props {
   lat: number;
@@ -12,17 +13,18 @@ interface Props {
 export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
   const mapRef      = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<any>(null);
-  const mountedRef  = useRef(false); // guards against StrictMode double-invoke
+  const tileRef     = useRef<any>(null);
+  const mountedRef  = useRef(false);
+  const { theme }   = useTheme();
 
+  // Initial map setup — runs once
   useEffect(() => {
-    if (mountedRef.current) return; // already ran — skip second StrictMode call
+    if (mountedRef.current) return;
     mountedRef.current = true;
-
     if (!mapRef.current) return;
 
     import("leaflet").then((L) => {
-      if (!mapRef.current) return;
-      if (instanceRef.current) return; // safety: already initialised
+      if (!mapRef.current || instanceRef.current) return;
 
       delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -34,8 +36,12 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
         attributionControl: true,
       });
 
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+
+      tileRef.current = L.tileLayer(
+        isDark
+          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
           subdomains: "abcd",
@@ -76,12 +82,29 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
 
       instanceRef.current = map;
     });
+  }, []);
 
-    return () => {
-      // Only destroy on true unmount, not StrictMode's fake unmount
-      // We rely on mountedRef to prevent re-init instead
-    };
-  }, []); // empty deps — runs once per true mount
+  // Swap tile layer when theme changes
+  useEffect(() => {
+    if (!instanceRef.current || !tileRef.current) return;
+
+    import("leaflet").then((L) => {
+      // Remove old tile layer
+      instanceRef.current.removeLayer(tileRef.current);
+
+      // Add new tile layer matching current theme
+      tileRef.current = L.tileLayer(
+        theme === "light"
+          ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: "abcd",
+          maxZoom: 20,
+        }
+      ).addTo(instanceRef.current);
+    });
+  }, [theme]);
 
   return (
     <>
@@ -136,7 +159,7 @@ export default function OfficeMap({ lat, lng, address, zoom = 15 }: Props) {
           overflow:hidden;margin-right:12px!important;margin-bottom:12px!important;
         }
         .leaflet-control-zoom a {
-           background: var(--map-zoom-bg) !important;color:var(--muted-2)!important;
+          background: var(--map-zoom-bg) !important;color:var(--muted-2)!important;
           border-bottom:1px solid var(--border)!important;
           width:28px!important;height:28px!important;line-height:28px!important;
           transition:all .15s ease!important;

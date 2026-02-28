@@ -127,7 +127,7 @@ export default function Navbar() {
       <style>{`
         .nav {
           position: fixed; top: 0; left: 0; right: 0;
-          height: var(--nav-h); z-index: 500;
+          height: var(--nav-h); z-index: 100;
           transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
           border-bottom: 1px solid transparent;
         }
@@ -197,7 +197,7 @@ export default function Navbar() {
 
         /* Mobile menu */
         .mobile-menu {
-          position: fixed; inset: 0; z-index: 499;
+          position: fixed; inset: 0; z-index: 99;
           background: var(--black);
           display: flex; flex-direction: column;
           padding-top: var(--nav-h);
