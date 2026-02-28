@@ -3,8 +3,8 @@ import { getHomeMetadata, getOrganizationStructuredData } from "@/lib/seo";
 import ScrollRevealInit from "@/hooks/useScrollReveal";
 import "./globals.css";
 import { Suspense } from "react";
-import ThemeProvider from "@/components/theme/ThemeProvider";
-
+import  ThemeProvider  from "@/components/theme/ThemeProvider";
+import { LanguageProvider } from "@/components/language/LanguageProvider";
 
 export const metadata: Metadata = getHomeMetadata();
 
@@ -27,12 +27,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
-          <ScrollRevealInit />
-          <Suspense fallback={null}>
-            {children}
-          </Suspense>
+          <LanguageProvider>
+            <ScrollRevealInit />
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
+          </LanguageProvider>
         </ThemeProvider>
-        
       </body>
     </html>
   );

@@ -85,6 +85,10 @@ export interface Listing {
   reference_code?: string | null;
   reference?:      string | null;
   geo_code?: string | null;
+
+  //eng
+  title_en?:       string | null;
+description_en?: string | null;
 }
 
 export interface ContactMessage {

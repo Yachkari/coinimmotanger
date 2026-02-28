@@ -162,67 +162,100 @@ export default function ListingForm({ listing }: Props) {
       <form onSubmit={handleSubmit} className="lf-form">
 
         {/* ── Core info ── */}
-        <section className="lf-section">
-          <h2 className="lf-section-title">Informations principales</h2>
+        {/* ── Core info ── */}
+<section className="lf-section">
+  <h2 className="lf-section-title">Informations principales</h2>
 
-          <div className="lf-field full">
-            <label className="lf-label">Titre de l'annonce *</label>
-            <input
-              className="lf-input"
-              value={form.title ?? ""}
-              onChange={(e) => set("title", e.target.value)}
-              placeholder="Ex: Villa moderne avec piscine à Malabata"
-              required
-            />
-          </div>
+  {/* French */}
+  <div className="lf-lang-block">
+    <div className="lf-lang-tag lf-lang-tag--fr">FR</div>
 
-          <div className="lf-row">
-            <div className="lf-field">
-              <label className="lf-label">Type de bien *</label>
-              <select className="lf-input" value={form.type} onChange={(e) => set("type", e.target.value)} required>
-                {TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
+    <div className="lf-field full">
+      <label className="lf-label">Titre de l'annonce *</label>
+      <input
+        className="lf-input"
+        value={form.title ?? ""}
+        onChange={(e) => set("title", e.target.value)}
+        placeholder="Ex: Villa moderne avec piscine à Malabata"
+        required
+      />
+    </div>
 
-            <div className="lf-field">
-              <label className="lf-label">Objectif *</label>
-              <select
-                className="lf-input"
-                value={form.purpose}
-                onChange={(e) => {
-                  set("purpose", e.target.value);
-                  if (e.target.value === "vente")    set("price_period", null);
-                  if (e.target.value === "location") set("price_period", "mois");
-                  if (e.target.value === "vacances") set("price_period", "nuit");
-                }}
-                required
-              >
-                {PURPOSE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
+    <div className="lf-field full">
+      <label className="lf-label">Description</label>
+      <textarea
+        className="lf-input lf-textarea"
+        value={form.description ?? ""}
+        onChange={(e) => set("description", e.target.value)}
+        placeholder="Décrivez le bien en détail : emplacement, état, points forts..."
+        rows={5}
+      />
+    </div>
+  </div>
 
-            <div className="lf-field">
-              <label className="lf-label">Statut</label>
-              <select className="lf-input" value={form.status} onChange={(e) => set("status", e.target.value)}>
-                <option value="disponible">Disponible</option>
-                <option value="vendu">Vendu</option>
-                <option value="loue">Loué</option>
-                <option value="reserve">Réservé</option>
-              </select>
-            </div>
-          </div>
+  {/* English */}
+  <div className="lf-lang-block lf-lang-block--en">
+    <div className="lf-lang-tag lf-lang-tag--en">EN</div>
 
-          <div className="lf-field full">
-            <label className="lf-label">Description</label>
-            <textarea
-              className="lf-input lf-textarea"
-              value={form.description ?? ""}
-              onChange={(e) => set("description", e.target.value)}
-              placeholder="Décrivez le bien en détail : emplacement, état, points forts..."
-              rows={5}
-            />
-          </div>
-        </section>
+    <div className="lf-field full">
+      <label className="lf-label">Title (English) <span className="optional">— optional</span></label>
+      <input
+        className="lf-input"
+        value={(form as any).title_en ?? ""}
+        onChange={(e) => set("title_en" as any, e.target.value || null)}
+        placeholder="Ex: Modern villa with pool in Malabata"
+      />
+    </div>
+
+    <div className="lf-field full">
+      <label className="lf-label">Description (English) <span className="optional">— optional</span></label>
+      <textarea
+        className="lf-input lf-textarea"
+        value={(form as any).description_en ?? ""}
+        onChange={(e) => set("description_en" as any, e.target.value || null)}
+        placeholder="Describe the property in detail: location, condition, highlights..."
+        rows={5}
+      />
+    </div>
+  </div>
+
+  {/* The rest of the row (type, purpose, status) stays unchanged */}
+  <div className="lf-row">
+    <div className="lf-field">
+      <label className="lf-label">Type de bien *</label>
+      <select className="lf-input" value={form.type} onChange={(e) => set("type", e.target.value)} required>
+        {TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+
+    <div className="lf-field">
+      <label className="lf-label">Objectif *</label>
+      <select
+        className="lf-input"
+        value={form.purpose}
+        onChange={(e) => {
+          set("purpose", e.target.value);
+          if (e.target.value === "vente")    set("price_period", null);
+          if (e.target.value === "location") set("price_period", "mois");
+          if (e.target.value === "vacances") set("price_period", "nuit");
+        }}
+        required
+      >
+        {PURPOSE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+
+    <div className="lf-field">
+      <label className="lf-label">Statut</label>
+      <select className="lf-input" value={form.status} onChange={(e) => set("status", e.target.value)}>
+        <option value="disponible">Disponible</option>
+        <option value="vendu">Vendu</option>
+        <option value="loue">Loué</option>
+        <option value="reserve">Réservé</option>
+      </select>
+    </div>
+  </div>
+</section>
 
         {/* ── Prix ── */}
         <section className="lf-section">
@@ -513,6 +546,36 @@ export default function ListingForm({ listing }: Props) {
   letter-spacing: 0.08em;
   cursor: default;
   user-select: all;
+}
+  .lf-lang-block {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 20px 4px;
+  margin-bottom: 20px;
+}
+.lf-lang-block--en {
+  border-color: rgba(201,168,76,0.2);
+  background: rgba(201,168,76,0.02);
+}
+.lf-lang-tag {
+  position: absolute;
+  top: -10px; left: 16px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-family: 'DM Sans', sans-serif;
+}
+.lf-lang-tag--fr {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.lf-lang-tag--en {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
 }
 
       `}</style>

@@ -6,18 +6,22 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
 import Image from "next/image";
 import ThemeToggle from "@/components/theme/ThemeToggle";
-
-const NAV = [
-  { href: "/vente",    label: "Acheter"  },
-  { href: "/location", label: "Louer"    },
-  { href: "/vacances", label: "Vacances" },
-  { href: "/contact",  label: "Contact"  },
-];
+import { LanguageToggle } from "@/components/language/LanguageToggle";
+import { useLanguage } from "@/components/language/LanguageProvider";
+import { t, tr } from "@/lib/translations";
 
 export default function Navbar() {
-  const pathname  = usePathname();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [open,     setOpen]     = useState(false);
+  const [open, setOpen] = useState(false);
+  const { lang } = useLanguage();
+
+  const NAV = [
+    { href: "/vente",    label: tr(t.nav.buy,      lang) },
+    { href: "/location", label: tr(t.nav.rent,     lang) },
+    { href: "/vacances", label: tr(t.nav.vacation, lang) },
+    { href: "/contact",  label: tr(t.nav.contact,  lang) },
+  ];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -36,32 +40,23 @@ export default function Navbar() {
         <div className="nav__inner container">
 
           {/* Logo */}
-          {/* <Link href="/" className="nav__logo" onClick={() => setOpen(false)}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="currentColor" strokeWidth="1" fill="none"/>
-              <path d="M12 2v20M2 7l10 5 10-5" stroke="currentColor" strokeWidth="1"/>
-            </svg>
-            <span className="nav__name">
-              {process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
-            </span>
-          </Link> */}
           <Link href="/" className="nav__logo" onClick={() => setOpen(false)}>
             <Image
-    src="/logo.png"
-    alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
-    width={180}
-    height={180}
-    className="nav__logo-img nav__logo-img--dark"
-    priority
-  />
+              src="/logo.png"
+              alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
+              width={180}
+              height={180}
+              className="nav__logo-img nav__logo-img--dark"
+              priority
+            />
             <Image
-    src="/logo-black.png"
-    alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
-    width={180}
-    height={180}
-    className="nav__logo-img nav__logo-img--light"
-    priority
-  />
+              src="/logo-black.png"
+              alt={process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier"}
+              width={180}
+              height={180}
+              className="nav__logo-img nav__logo-img--light"
+              priority
+            />
           </Link>
 
           {/* Center nav */}
@@ -81,9 +76,10 @@ export default function Navbar() {
           <div className="nav__actions">
             <Link href="/recherche" className="nav__search">
               <Search size={15} />
-              <span>Rechercher</span>
+              <span>{tr(t.nav.search, lang)}</span>
             </Link>
             <ThemeToggle />
+            <LanguageToggle />
             <button
               className="nav__burger"
               onClick={() => setOpen(!open)}
@@ -117,14 +113,16 @@ export default function Navbar() {
             onClick={() => setOpen(false)}
           >
             <span className="mobile-menu__num">05</span>
-            Rechercher
+            {tr(t.nav.search, lang)}
           </Link>
         </div>
         <div className="mobile-menu__footer">
-          <p>{process.env.NEXT_PUBLIC_SITE_NAME} · Immobilier au Maroc</p>
+          <div className="mobile-menu__footer-row">
+            <p>{process.env.NEXT_PUBLIC_SITE_NAME} · Immobilier au Maroc</p>
+            <LanguageToggle />
+          </div>
         </div>
       </div>
-      
 
       <style>{`
         .nav {
@@ -134,11 +132,11 @@ export default function Navbar() {
           border-bottom: 1px solid transparent;
         }
         .nav--scrolled {
-  background: var(--nav-bg-scrolled);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-bottom-color: var(--border);
-}
+          background: var(--nav-bg-scrolled);
+          backdrop-filter: blur(20px) saturate(1.4);
+          -webkit-backdrop-filter: blur(20px) saturate(1.4);
+          border-bottom-color: var(--border);
+        }
         .nav--open { background: var(--black) !important; border-bottom-color: var(--border) !important; }
 
         .nav__inner {
@@ -148,14 +146,18 @@ export default function Navbar() {
         }
 
         .nav__logo {
-          display: flex; align-items: center; gap: 12px;
-          color: var(--white); text-decoration: none; flex-shrink: 0;
+          display: flex; align-items: center;
+          text-decoration: none; flex-shrink: 0;
         }
         .nav__logo svg { color: var(--gold); }
         .nav__name {
           font-family: var(--font-display);
           font-size: 17px; font-weight: 500;
           letter-spacing: 0.04em; color: var(--white);
+        }
+        .nav__logo-img {
+          height: 180px; width: auto;
+          object-fit: contain;
         }
 
         .nav__links { display: flex; align-items: center; gap: 36px; }
@@ -192,14 +194,6 @@ export default function Navbar() {
           background: none; border: none; color: var(--white);
           padding: 8px; cursor: pointer;
         }
-          .nav__logo {
-  display: flex; align-items: center;
-  text-decoration: none; flex-shrink: 0;
-}
-.nav__logo-img {
-  height: 180px; width: auto;
-  object-fit: contain;
-}
 
         /* Mobile menu */
         .mobile-menu {
@@ -240,6 +234,10 @@ export default function Navbar() {
           padding: 28px 40px;
           font-size: 12px; color: var(--muted);
           letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .mobile-menu__footer-row {
+          display: flex; align-items: center;
+          justify-content: space-between;
         }
 
         @media (max-width: 1000px) {

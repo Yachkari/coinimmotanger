@@ -302,6 +302,7 @@
 [data-theme="light"] .lb__close,
 [data-theme="light"] .lb__prev,
 [data-theme="light"] .lb__next,
+[data-theme="light"] .adv,
 [data-theme="light"] .lb__counter {
   color: #ffffff !important;
 }

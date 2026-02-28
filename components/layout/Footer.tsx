@@ -1,7 +1,15 @@
+'use client'
+
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/components/language/LanguageProvider";
+import { t, tr } from "@/lib/translations";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 export default function Footer() {
+  const { lang } = useLanguage();
+  const { theme } = useTheme();
+
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Immobilier";
   const phone    = process.env.NEXT_PUBLIC_CONTACT_PHONE;
   const email    = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
@@ -19,16 +27,9 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="footer__brand">
-            {/* <div className="footer__logo">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="currentColor" strokeWidth="1"/>
-                <path d="M12 2v20M2 7l10 5 10-5" stroke="currentColor" strokeWidth="1"/>
-              </svg>
-              <span>{siteName}</span>
-            </div> */}
             <div className="footer__logo">
               <Image
-                src="/logo.png"
+                src={theme === 'light' ? "/logo-black.png" : "/logo.png"}
                 alt={siteName}
                 width={140}
                 height={140}
@@ -36,7 +37,9 @@ export default function Footer() {
               />
             </div>
             <p className="footer__tagline">
-              L'immobilier d'exception au nord du Maroc. Vente, location et vacances.
+              {lang === 'fr'
+                ? "L'immobilier d'exception au nord du Maroc. Vente, location et vacances."
+                : "Exceptional real estate in northern Morocco. Sales, rentals and vacations."}
             </p>
 
             {/* Contact details */}
@@ -92,19 +95,23 @@ export default function Footer() {
 
           {/* Nav */}
           <div className="footer__col">
-            <h4 className="footer__heading">Explorer</h4>
+            <h4 className="footer__heading">
+              {lang === 'fr' ? 'Explorer' : 'Explore'}
+            </h4>
             <nav className="footer__nav">
-              <Link href="/vente"     className="footer__link">Acheter un bien</Link>
-              <Link href="/location"  className="footer__link">Louer un bien</Link>
-              <Link href="/vacances"  className="footer__link">Vacances</Link>
-              <Link href="/recherche" className="footer__link">Recherche avancée</Link>
-              <Link href="/contact"   className="footer__link">Contact</Link>
+              <Link href="/vente"     className="footer__link">{tr(t.nav.buy,      lang)}</Link>
+              <Link href="/location"  className="footer__link">{tr(t.nav.rent,     lang)}</Link>
+              <Link href="/vacances"  className="footer__link">{tr(t.nav.vacation, lang)}</Link>
+              <Link href="/recherche" className="footer__link">{lang === 'fr' ? 'Recherche avancée' : 'Advanced search'}</Link>
+              <Link href="/contact"   className="footer__link">{tr(t.nav.contact,  lang)}</Link>
             </nav>
           </div>
 
           {/* Cities */}
           <div className="footer__col">
-            <h4 className="footer__heading">Villes</h4>
+            <h4 className="footer__heading">
+              {lang === 'fr' ? 'Villes' : 'Cities'}
+            </h4>
             <nav className="footer__nav">
               {["Tanger", "Tétouan", "M'diq", "Martil", "Al Hoceima"].map(c => (
                 <Link key={c} href={`/vente?city=${encodeURIComponent(c)}`} className="footer__link">
@@ -117,8 +124,10 @@ export default function Footer() {
         </div>
 
         <div className="footer__bottom">
-          <p>© {year} {siteName}. Tous droits réservés.</p>
-          <span className="footer__bottom-tag">Immobilier au Maroc</span>
+          <p>© {year} {siteName}. {tr(t.footer.rights, lang)}</p>
+          <span className="footer__bottom-tag">
+            {lang === 'fr' ? 'Immobilier au Maroc' : 'Real Estate in Morocco'}
+          </span>
         </div>
       </div>
 
@@ -129,15 +138,15 @@ export default function Footer() {
           margin-top: 120px;
           position: relative;
         }
-          .footer__logo {
-  margin-bottom: 16px;
-  margin-top: -60px;
-}
-.footer__logo-img {
-  height: 140px; width: auto;
-  object-fit: contain;
-  opacity: 0.9;
-}
+        .footer__logo {
+          margin-bottom: 16px;
+          margin-top: -60px;
+        }
+        .footer__logo-img {
+          height: 140px; width: auto;
+          object-fit: contain;
+          opacity: 0.9;
+        }
         .footer__line {
           position: absolute; top: 0; left: 40px; right: 40px;
           height: 1px;
@@ -151,20 +160,10 @@ export default function Footer() {
         @media (max-width: 768px) {
           .footer__grid { grid-template-columns: 1fr; gap: 40px; }
         }
-
-        .footer__logo {
-          display: flex; align-items: center; gap: 10px;
-          font-family: var(--font-display);
-          font-size: 18px; color: var(--white); margin-bottom: 16px;
-        }
-        .footer__logo svg { color: var(--gold); }
-
         .footer__tagline {
           font-size: 14px; color: var(--muted);
           line-height: 1.7; max-width: 280px; margin-bottom: 20px;
         }
-
-        /* Contact details */
         .footer__contact {
           display: flex; flex-direction: column; gap: 10px;
           margin-bottom: 24px;
@@ -176,8 +175,6 @@ export default function Footer() {
         }
         .footer__contact-item:hover { color: var(--gold); }
         .footer__contact-item svg { color: var(--gold); flex-shrink: 0; }
-
-        /* Social icons */
         .footer__socials { display: flex; gap: 8px; }
         .footer__social {
           width: 36px; height: 36px; border-radius: var(--r-sm);
@@ -197,7 +194,6 @@ export default function Footer() {
           color: #4cd880;
           background: rgba(37,211,102,0.08);
         }
-
         .footer__heading {
           font-family: var(--font-ui);
           font-size: 10px; font-weight: 600;
@@ -210,7 +206,6 @@ export default function Footer() {
           text-decoration: none; transition: color 0.2s ease;
         }
         .footer__link:hover { color: var(--white); }
-
         .footer__bottom {
           display: flex; align-items: center; justify-content: space-between;
           padding: 24px 0; border-top: 1px solid var(--border);

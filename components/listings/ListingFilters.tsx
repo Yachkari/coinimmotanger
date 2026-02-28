@@ -6,6 +6,8 @@ import type { ListingPurpose } from "@/types";
 import { TYPE_OPTIONS, SORT_OPTIONS, BEDROOMS_OPTIONS } from "@/constants/filters";
 import { CITY_NAMES } from "@/constants/cities";
 import { SlidersHorizontal, X } from "lucide-react";
+import { useLanguage } from "@/components/language/LanguageProvider";
+import { t, tr } from "@/lib/translations";
 
 interface Props {
   purpose:        ListingPurpose;
@@ -22,6 +24,7 @@ const PER_PAGE_OPTIONS = [
 export default function ListingFilters({ purpose, currentFilters }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
+  const { lang } = useLanguage();
 
   const [type,     setType]     = useState(currentFilters.type     ?? "");
   const [city,     setCity]     = useState(currentFilters.city     ?? "");
@@ -54,22 +57,25 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
   return (
     <div className="filters">
+
       {/* Header */}
       <div className="filters__head">
         <div className="filters__title">
           <SlidersHorizontal size={14} />
-          Filtres
+          {tr(t.filters.title, lang)}
         </div>
         {hasFilters && (
           <button onClick={clear} className="filters__clear">
-            <X size={12} /> Effacer
+            <X size={12} /> {tr(t.filters.reset, lang)}
           </button>
         )}
       </div>
 
       {/* Per page */}
       <div className="filter-group">
-        <span className="filter-label">Par page</span>
+        <span className="filter-label">
+          {lang === 'fr' ? 'Par page' : 'Per page'}
+        </span>
         <div className="pill-row">
           {PER_PAGE_OPTIONS.map(o => (
             <button
@@ -85,7 +91,9 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Sort */}
       <div className="filter-group">
-        <span className="filter-label">Trier par</span>
+        <span className="filter-label">
+          {lang === 'fr' ? 'Trier par' : 'Sort by'}
+        </span>
         <select className="filter-select" value={orderBy} onChange={e => setOrderBy(e.target.value)}>
           {SORT_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -95,9 +103,9 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Type */}
       <div className="filter-group">
-        <span className="filter-label">Type de bien</span>
+        <span className="filter-label">{tr(t.filters.type, lang)}</span>
         <select className="filter-select" value={type} onChange={e => setType(e.target.value)}>
-          <option value="">Tous les types</option>
+          <option value="">{tr(t.filters.allTypes, lang)}</option>
           {TYPE_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
@@ -106,9 +114,9 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* City */}
       <div className="filter-group">
-        <span className="filter-label">Ville</span>
+        <span className="filter-label">{tr(t.filters.city, lang)}</span>
         <select className="filter-select" value={city} onChange={e => setCity(e.target.value)}>
-          <option value="">Toutes les villes</option>
+          <option value="">{tr(t.filters.allCities, lang)}</option>
           {CITY_NAMES.map(c => (
             <option key={c} value={c}>{c}</option>
           ))}
@@ -117,15 +125,19 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Price */}
       <div className="filter-group">
-        <span className="filter-label">Budget (MAD)</span>
+        <span className="filter-label">
+          {lang === 'fr' ? 'Budget (MAD)' : 'Budget (MAD)'}
+        </span>
         <div className="filter-range">
           <input
-            type="number" className="filter-input" placeholder="Min"
+            type="number" className="filter-input"
+            placeholder={lang === 'fr' ? 'Min' : 'Min'}
             value={minPrice} onChange={e => setMinPrice(e.target.value)} min={0}
           />
           <span className="filter-range-sep">—</span>
           <input
-            type="number" className="filter-input" placeholder="Max"
+            type="number" className="filter-input"
+            placeholder={lang === 'fr' ? 'Max' : 'Max'}
             value={maxPrice} onChange={e => setMaxPrice(e.target.value)} min={0}
           />
         </div>
@@ -133,7 +145,9 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
 
       {/* Bedrooms */}
       <div className="filter-group">
-        <span className="filter-label">Chambres (min)</span>
+        <span className="filter-label">
+          {lang === 'fr' ? 'Chambres (min)' : 'Bedrooms (min)'}
+        </span>
         <div className="pill-row">
           {BEDROOMS_OPTIONS.map(o => (
             <button
@@ -148,7 +162,7 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
       </div>
 
       <button onClick={apply} className="filters__apply">
-        Appliquer
+        {tr(t.filters.apply, lang)}
       </button>
 
       <style>{`
@@ -159,7 +173,6 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
           padding: 24px;
           display: flex; flex-direction: column; gap: 24px;
         }
-
         .filters__head {
           display: flex; align-items: center; justify-content: space-between;
         }
@@ -178,14 +191,12 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
           letter-spacing: 0.04em;
         }
         .filters__clear:hover { background: rgba(184,151,90,0.1); }
-
         .filter-group { display: flex; flex-direction: column; gap: 10px; }
         .filter-label {
           font-size: 10px; font-weight: 600;
           color: var(--muted); text-transform: uppercase;
           letter-spacing: 0.12em;
         }
-
         .filter-select {
           background: var(--surface-3);
           border: 1px solid var(--border);
@@ -199,7 +210,6 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
         }
         .filter-select:focus { border-color: var(--gold); }
         .filter-select option { background: var(--surface-3); color: var(--off-white); }
-
         .filter-range { display: flex; align-items: center; gap: 8px; }
         .filter-range-sep { color: var(--muted); font-size: 12px; flex-shrink: 0; }
         .filter-input {
@@ -214,7 +224,6 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
         }
         .filter-input::placeholder { color: var(--muted); }
         .filter-input:focus { border-color: var(--gold); }
-
         .pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
         .pill {
           padding: 7px 14px; border-radius: 2px;
@@ -232,7 +241,6 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
           color: var(--gold);
           background: rgba(184,151,90,0.1);
         }
-
         .filters__apply {
           background: var(--gold); color: var(--black);
           border: none; border-radius: var(--r-sm);
