@@ -8,7 +8,7 @@ import ListingCard from '@/components/listings/ListingCard'
 import ListingGallery from '@/components/listings/ListingGallery'
 import { MapPin, Maximize2, Bed, Bath, Layers, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import type { Listing } from '@/types'
+import type { Listing, ListingImage } from '@/types'
 
 interface Props {
   purpose:    string
@@ -16,7 +16,7 @@ interface Props {
   related:    Listing[]
   amenities:  { key: string; label: string }[]
   structured: object
-  images:     { url: string; order: number }[]
+  images:     ListingImage[]   // ← was { url: string; order: number }[]
 }
 
 const STATUS_MAP: Record<string, string> = {
