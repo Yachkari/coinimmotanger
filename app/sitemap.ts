@@ -11,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/location`,  lastModified: new Date(), changeFrequency: "daily",   priority: 0.9 },
     { url: `${SITE_URL}/vacances`,  lastModified: new Date(), changeFrequency: "weekly",  priority: 0.8 },
     { url: `${SITE_URL}/recherche`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`,   lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
   ];
 
   try {
@@ -18,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data } = await supabase
       .from("listings")
       .select("slug, purpose, updated_at")
-      .eq("status", "active");
+      .eq("status", "disponible");
 
     if (!data) return staticPages;
 

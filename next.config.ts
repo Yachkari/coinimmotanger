@@ -27,20 +27,36 @@ const nextConfig: NextConfig = {
   // Old or short URLs redirected to their canonical versions
   // Useful for SEO — avoids duplicate content
   // ============================================================
-  async redirects() {
-    return [
-      {
-        source: "/listings",
-        destination: "/vente",
-        permanent: true,  // 308 — tells Google the old URL is gone for good
-      },
-      {
-        source: "/rent",
-        destination: "/location",
-        permanent: true,
-      },
-    ];
-  },
+ async redirects() {
+  return [
+    // ── Canonical domain — non-www → www ──────────────────
+    {
+      source:      '/:path*',
+      has:         [{ type: 'host', value: 'coinimmotanger.com' }],
+      destination: 'https://www.coinimmotanger.com/:path*',
+      permanent:   true,
+    },
+    // ── Canonical domain — http → https ───────────────────
+    {
+      source:      '/:path*',
+      has:         [{ type: 'header', key: 'x-forwarded-proto', value: 'http' }],
+      destination: 'https://www.coinimmotanger.com/:path*',
+      permanent:   true,
+    },
+
+    // ── Existing redirects ────────────────────────────────
+    {
+      source:      '/listings',
+      destination: '/vente',
+      permanent:   true,
+    },
+    {
+      source:      '/rent',
+      destination: '/location',
+      permanent:   true,
+    },
+  ];
+},
 
   // ============================================================
   // HEADERS

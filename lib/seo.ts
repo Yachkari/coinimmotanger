@@ -21,6 +21,9 @@ export function getHomeMetadata(): Metadata {
       `Trouvez votre bien immobilier idéal : appartements, villas et maisons à vendre, ` +
       `à louer ou en vacances. Consultez nos meilleures offres dès maintenant.`,
     metadataBase: new URL(SITE_URL),
+    alternates: {
+    canonical: '/',
+  },
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
