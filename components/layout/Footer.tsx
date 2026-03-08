@@ -101,7 +101,7 @@ export default function Footer() {
             <nav className="footer__nav">
               <Link href="/vente"     className="footer__link">{tr(t.nav.buy,      lang)}</Link>
               <Link href="/location"  className="footer__link">{tr(t.nav.rent,     lang)}</Link>
-              <Link href="/vacances"  className="footer__link">{tr(t.nav.vacation, lang)}</Link>
+              {/* <Link href="/vacances"  className="footer__link">{tr(t.nav.vacation, lang)}</Link> */}
               <Link href="/recherche" className="footer__link">{lang === 'fr' ? 'Recherche avancée' : 'Advanced search'}</Link>
               <Link href="/contact"   className="footer__link">{tr(t.nav.contact,  lang)}</Link>
             </nav>

@@ -19,7 +19,7 @@ export default function Navbar() {
   const NAV = [
     { href: "/vente",    label: tr(t.nav.buy,      lang) },
     { href: "/location", label: tr(t.nav.rent,     lang) },
-    { href: "/vacances", label: tr(t.nav.vacation, lang) },
+    // { href: "/vacances", label: tr(t.nav.vacation, lang) },
     { href: "/contact",  label: tr(t.nav.contact,  lang) },
   ];
 
