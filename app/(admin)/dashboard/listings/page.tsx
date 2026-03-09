@@ -48,6 +48,10 @@ export default function ListingsPage() {
   setStatus(""); setPurpose(""); setType(""); setGeoCode("");
 }
 
+function handleDelete(id: string) {
+  setListings(prev => prev.filter(l => l.id !== id))
+}
+
   return (
     <div className="lp">
 
@@ -167,7 +171,7 @@ export default function ListingsPage() {
                         <Link href={`/dashboard/listings/${l.id}/edit`} className="lp__action" title="Modifier">
                           <Pencil size={14} />
                         </Link>
-                        <DeleteListingButton id={l.id} title={l.title} />
+                        <DeleteListingButton id={l.id} title={l.title} onDelete={handleDelete}/>
                       </div>
                     </td>
                   </tr>

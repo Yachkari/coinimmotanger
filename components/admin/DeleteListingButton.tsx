@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
-export default function DeleteListingButton({ id, title }: { id: string; title: string }) {
-  const router      = useRouter();
+export default function DeleteListingButton({
+  id, title, onDelete
+}: {
+  id: string;
+  title: string;
+  onDelete: (id: string) => void
+}) {
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
@@ -16,7 +20,7 @@ export default function DeleteListingButton({ id, title }: { id: string; title: 
         method: "DELETE",
         headers: { "x-admin-token": process.env.NEXT_PUBLIC_ADMIN_API_TOKEN! },
       });
-      if (res.ok) router.refresh();
+      if (res.ok) onDelete(id); // ← remove from state instantly
       else alert("Erreur lors de la suppression.");
     } catch {
       alert("Erreur réseau.");
@@ -42,7 +46,6 @@ export default function DeleteListingButton({ id, title }: { id: string; title: 
         }
         .del-btn:disabled { opacity: .4; cursor: not-allowed; }
       `}</style>
-      
     </button>
   );
 }
