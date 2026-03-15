@@ -24,6 +24,7 @@ export default async function RecherchePage({ searchParams }: Props) {
     purpose:  sp.purpose as ListingPurpose ?? undefined,
     type:     sp.type    as PropertyType   ?? undefined,
     city:     sp.city                      ?? undefined,
+    neighborhood: sp.neighborhood              ?? undefined,
     minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
     bedrooms: sp.bedrooms ? Number(sp.bedrooms) : undefined,
@@ -32,7 +33,7 @@ export default async function RecherchePage({ searchParams }: Props) {
     limit,
   };
 
-  const hasFilters = !!(sp.purpose || sp.type || sp.city || sp.minPrice || sp.maxPrice || sp.bedrooms);
+  const hasFilters = !!(sp.purpose || sp.type || sp.city || sp.neighborhood || sp.minPrice || sp.maxPrice || sp.bedrooms);
 
   const result     = await getListings(filters);
   const listings   = result.data?.listings   ?? [];

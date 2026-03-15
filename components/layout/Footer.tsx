@@ -38,8 +38,8 @@ export default function Footer() {
             </div>
             <p className="footer__tagline">
               {lang === 'fr'
-                ? "L'immobilier d'exception au nord du Maroc. Vente, location et vacances."
-                : "Exceptional real estate in northern Morocco. Sales, rentals and vacations."}
+                ? "L'immobilier d'exception au nord du Maroc. Vente, location et achat."
+                : "Exceptional real estate in northern Morocco. Sales, rentals and buying."}
             </p>
 
             {/* Contact details */}
@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
 
           {/* Cities */}
-          <div className="footer__col">
+          {/* <div className="footer__col">
             <h4 className="footer__heading">
               {lang === 'fr' ? 'Villes' : 'Cities'}
             </h4>
@@ -119,7 +119,7 @@ export default function Footer() {
                 </Link>
               ))}
             </nav>
-          </div>
+          </div> */}
 
         </div>
 

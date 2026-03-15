@@ -28,6 +28,7 @@ export async function getListings(
       purpose,
       type,
       city,
+      neighborhood,
       minPrice,
       maxPrice,
       minSurface,
@@ -58,6 +59,7 @@ export async function getListings(
       if (purpose)    q = q.eq("purpose", purpose);
       if (type)       q = q.eq("type", type);
       if (city)       q = q.eq("city", city);
+      if (neighborhood) q = q.eq("neighborhood", filters.neighborhood);
       if (status)     q = q.eq("status", status);
       if (minPrice)   q = q.gte("price", minPrice);
       if (maxPrice)   q = q.lte("price", maxPrice);

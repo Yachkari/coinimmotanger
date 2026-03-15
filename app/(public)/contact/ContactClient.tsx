@@ -112,7 +112,7 @@ export default function ContactPage() {
                   {lang === 'fr' ? 'Disponibilité' : 'Availability'}
                 </span>
                 <span className="cp__card-val">
-                  {lang === 'fr' ? 'Lun–Sam, 9h–19h' : 'Mon–Sat, 9am–7pm'}
+                  {lang === 'fr' ? 'Lun–Ven, 9h–19h sur rendez-vous' : 'Mon–Fri, 9am–7pm by appointment'}
                 </span>
               </div>
             </div>

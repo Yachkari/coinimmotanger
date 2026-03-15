@@ -89,18 +89,18 @@ export default function HomeContent({ featured, total }: Props) {
               {
                 href: '/vente',
                 label: tr(t.nav.buy, lang),
-                count: lang === 'fr' ? 'Appartements · Villas · Maisons' : 'Apartments · Villas · Houses',
+                count: lang === 'fr' ? 'Appartements · Villas · Maisons · Terrains' : 'Apartments · Villas · Houses · Terrains',
               },
               {
                 href: '/location',
                 label: tr(t.nav.rent, lang),
                 count: lang === 'fr' ? 'Location longue durée' : 'Long-term rental',
               },
-              {
-                href: '/vacances',
-                label: tr(t.nav.vacation, lang),
-                count: lang === 'fr' ? 'Séjours & courts séjours' : 'Stays & short-term rentals',
-              },
+              // {
+              //   href: '/vacances',
+              //   label: tr(t.nav.vacation, lang),
+              //   count: lang === 'fr' ? 'Séjours & courts séjours' : 'Stays & short-term rentals',
+              // },
             ].map(({ href, label, count }) => (
               <Link key={href} href={href} className="hero__cat">
                 <div>
@@ -352,7 +352,7 @@ export default function HomeContent({ featured, total }: Props) {
           background: rgba(8,8,8,0.6);
           backdrop-filter: blur(20px);
         }
-        .hero__categories-inner { display: grid; grid-template-columns: repeat(3, 1fr); }
+        .hero__categories-inner { display: grid; grid-template-columns: repeat(2, 1fr); }
         .hero__cat {
           display: flex; align-items: center; justify-content: space-between;
           padding: 24px 40px; gap: 12px;

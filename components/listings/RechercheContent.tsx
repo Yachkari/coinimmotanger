@@ -9,6 +9,7 @@ import { Search } from 'lucide-react'
 import { CITY_NAMES } from '@/constants/cities'
 import { TYPE_OPTIONS, PURPOSE_OPTIONS, SORT_OPTIONS } from '@/constants/filters'
 import type { Listing } from '@/types'
+import { CITIES } from '@/constants/cities'
 
 const PER_PAGE_OPTIONS = ['6', '9', '12', '24']
 
@@ -53,7 +54,7 @@ export default function RechercheContent({
           <form method="GET" action="/recherche" className="rp__form">
 
             <select name="purpose" className="rp__select" defaultValue={sp.purpose ?? ''}>
-              <option value="">{lang === 'fr' ? 'Acheter / Louer / Vacances' : 'Buy / Rent / Vacation'}</option>
+              <option value="">{lang === 'fr' ? 'Acheter / Louer' : 'Buy / Rent'}</option>
               {PURPOSE_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
@@ -72,6 +73,15 @@ export default function RechercheContent({
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
+            {/* Neighborhood — shows all neighborhoods of selected city */}
+            {sp.city && (
+              <select name="neighborhood" className="rp__select" defaultValue={sp.neighborhood ?? ''}>
+                <option value="">{lang === 'fr' ? 'Tous les quartiers' : 'All neighborhoods'}</option>
+                {(CITIES.find(c => c.name === sp.city)?.neighborhoods ?? []).map(n => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            )}
 
             <input
               type="number" name="minPrice"
@@ -140,12 +150,12 @@ export default function RechercheContent({
                   sub:   lang === 'fr' ? 'Location longue durée'         : 'Long-term rental',
                   emoji: '🔑',
                 },
-                {
-                  href: '/vacances',
-                  label: lang === 'fr' ? 'Locations vacances' : 'Vacation rentals',
-                  sub:   lang === 'fr' ? 'Séjours & courts séjours'      : 'Stays & short-term rentals',
-                  emoji: '☀️',
-                },
+                // {
+                //   href: '/vacances',
+                //   label: lang === 'fr' ? 'Locations vacances' : 'Vacation rentals',
+                //   sub:   lang === 'fr' ? 'Séjours & courts séjours'      : 'Stays & short-term rentals',
+                //   emoji: '☀️',
+                // },
               ].map(({ href, label, sub, emoji }, i) => (
                 <Link
                   key={href}

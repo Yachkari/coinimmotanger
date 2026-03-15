@@ -129,6 +129,7 @@ export interface ListingFilters {
   purpose?: ListingPurpose;
   type?: PropertyType;
   city?: string;
+  neighborhood?:string;
   minPrice?: number;
   maxPrice?: number;
   minSurface?: number;

@@ -8,6 +8,7 @@ import { CITY_NAMES } from "@/constants/cities";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useLanguage } from "@/components/language/LanguageProvider";
 import { t, tr } from "@/lib/translations";
+import { CITIES } from "@/constants/cities";
 
 interface Props {
   purpose:        ListingPurpose;
@@ -52,6 +53,10 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
   const [bedrooms, setBedrooms] = useState(currentFilters.bedrooms ?? "");
   const [orderBy,  setOrderBy]  = useState(currentFilters.orderBy  ?? "date_desc");
   const [limit,    setLimit]    = useState(currentFilters.limit    ?? "9");
+  const [neighborhood, setNeighborhood] = useState(currentFilters.neighborhood ?? "");
+  const neighborhoods = city
+  ? (CITIES.find(c => c.name === city)?.neighborhoods ?? [])
+  : [];
 
   function apply() {
     const params = new URLSearchParams();
@@ -62,17 +67,18 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
     if (bedrooms) params.set("bedrooms", bedrooms);
     if (orderBy)  params.set("orderBy",  orderBy);
     if (limit)    params.set("limit",    limit);
+    if (neighborhood) params.set("neighborhood", neighborhood);
     params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   }
 
   function clear() {
     setType(""); setCity(""); setMinPrice("");
-    setMaxPrice(""); setBedrooms(""); setOrderBy("date_desc"); setLimit("9");
+    setMaxPrice(""); setBedrooms(""); setOrderBy("date_desc"); setLimit("9");setNeighborhood("");
     router.push(pathname);
   }
 
-  const hasFilters = !!(type || city || minPrice || maxPrice || bedrooms);
+  const hasFilters = !!(type || city || neighborhood || minPrice || maxPrice || bedrooms);
 
   return (
     <div className="filters">
@@ -141,6 +147,24 @@ export default function ListingFilters({ purpose, currentFilters }: Props) {
           ))}
         </select>
       </div>
+      {/* Neighborhood */}
+{neighborhoods.length > 0 && (
+  <div className="filter-group">
+    <span className="filter-label">
+      {lang === 'fr' ? 'Quartier' : 'Neighborhood'}
+    </span>
+    <select
+      className="filter-select"
+      value={neighborhood}
+      onChange={e => setNeighborhood(e.target.value)}
+    >
+      <option value="">{lang === 'fr' ? 'Tous les quartiers' : 'All neighborhoods'}</option>
+      {neighborhoods.map(n => (
+        <option key={n} value={n}>{n}</option>
+      ))}
+    </select>
+  </div>
+)}
 
       {/* Price */}
       <div className="filter-group">

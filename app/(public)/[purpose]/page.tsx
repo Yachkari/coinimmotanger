@@ -27,16 +27,17 @@ export default async function ListingsPage({ params, searchParams }: Props) {
   const page  = sp.page  ? Number(sp.page)  : 1;
 
   const filters: ListingFiltersWithPagination = {
-    purpose:  purpose as ListingPurpose,
-    type:     sp.type     as any ?? undefined,
-    city:     sp.city             ?? undefined,
-    minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
-    maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
-    bedrooms: sp.bedrooms ? Number(sp.bedrooms) : undefined,
-    orderBy:  sp.orderBy  as any ?? "date_desc",
-    page,
-    limit,
-  };
+  purpose:      purpose as ListingPurpose,
+  type:         sp.type     as any ?? undefined,
+  city:         sp.city             ?? undefined,
+  neighborhood: sp.neighborhood     ?? undefined,
+  minPrice:     sp.minPrice ? Number(sp.minPrice) : undefined,
+  maxPrice:     sp.maxPrice ? Number(sp.maxPrice) : undefined,
+  bedrooms:     sp.bedrooms ? Number(sp.bedrooms) : undefined,
+  orderBy:      sp.orderBy  as any ?? "date_desc",
+  page,
+  limit,
+};
 
   const result     = await getListings(filters);
   const listings   = result.data?.listings   ?? [];
